@@ -400,13 +400,13 @@ Done        bra     Main                    ; always loop Main
 ;{          ClearGraphics
 ClearGraphics            
             ldd     #$FFFF
-            ldx     #VID_START                  ; beginning of video space
+            ldx     #VID_START              ; beginning of video space
 GraphicCLR  std     ,x++
-            cmpx    #VID_END                    ; clear $2800-$2C80 for temp space
-            blo     GraphicCLR                  ; are we there yet? no - go for more
+            cmpx    #VID_END                ; clear $2800-$2C80 for temp space
+            blo     GraphicCLR              ; are we there yet? no - go for more
             
-            ldd     #$0000                      ; clear temp space
-            ldx     #VID_START+$1B00            ; offset from video space
+            ldd     #$0000                  ; clear temp space
+            ldx     #VID_START+$1B00        ; offset from video space
 GraphicCLR2 
             std     ,x++
             cmpx    #VID_START+$24FF
@@ -446,6 +446,7 @@ playTune1   lda     #3
             ldd     ,x++                    ;get beginning 2 notes from pattern - cont
             rts
 ;}            
+
 
 ;*******************************************************************************
 ;*                                                                             *
@@ -507,6 +508,7 @@ mloop       ldd     1,x
             sta     ddd+2
             rts
 ;}
+
 
 ;*******************************************************************************
 ;*                                                                             *
@@ -697,6 +699,7 @@ ReallyDone
             rts
 ;}
 
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Stage game                                                         *
@@ -720,6 +723,7 @@ SkipHigh
 
             rts
 ;}
+
 
 ;*******************************************************************************
 ;*                                                                             *
@@ -766,9 +770,13 @@ ReturnMain
             rts
 ;}
 
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Draw New Ground                                                    *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,x                                                      *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          NewGround
@@ -808,6 +816,9 @@ ContGround
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Draw Ground                                                        *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doGround
@@ -833,6 +844,9 @@ doneGround
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Handle Obstacles                                                   *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,x                                                      *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doObstacle
@@ -893,6 +907,9 @@ GoScroll
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Cycle Obstacles (demo mode)                                        *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          CycleObst
@@ -927,6 +944,9 @@ Set4
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Draw Moon                                                          *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,u                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doMoon
@@ -956,7 +976,10 @@ doneMoon
 
 ;*******************************************************************************
 ;*                                                                             *
-;*          Draw Cactus                                                        *
+;*          Draw Cactus (and other obstacles)                                  *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x                                                    *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doCactus
@@ -1003,6 +1026,9 @@ doneCactus
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Draw Pterodactyl                                                   *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,y                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doPtero
@@ -1046,6 +1072,9 @@ skipPtero
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Draw Dino (Start and Dead Position)                                *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,d,x,u                                                *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          dinoBegEnd
@@ -1092,6 +1121,9 @@ dinoDone
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Do Dino Frames (animate)                                           *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,d,x,y,u                                              *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doDino
@@ -1101,7 +1133,7 @@ doDino
             beq     CheckJump
             dec     DuckState
             lda     duckframe
-            cmpa    #04             ; clear ani-frame above duck?
+            cmpa    #04                     ; clear ani-frame above duck?
             bne     DinoDuck
             dec     duckframe
             ldu     #dinoduck1clear
@@ -1114,12 +1146,12 @@ DinoDuck
             beq     DuckFrame1
 DuckFrame2  
             ldu     #dinoduck2i
-            bra     DrawDino		;BRA cheaper as in +/- 127 range
+            bra     DrawDino
 DuckFrame1  
             lda     #DUCK_FRAME
             sta     duckframe
             ldu     #dinoduck1i
-            bra     DrawDino		;BRA cheaper as in +/- 127 range
+            bra     DrawDino
 
 CheckJump   
             lda     JumpState
@@ -1135,7 +1167,7 @@ DinoJump
             leax    d,x
             dec     JumpState
             ldu     #dinostandi
-            bra     DrawDino		;BRA CHEAPER (3 cycles total (JMP is 4))
+            bra     DrawDino
             
 RunDino     ldy     #DINO_START+$0280
             sty     DinoFeet
@@ -1149,8 +1181,8 @@ run_dino2   ldu     #dinorun2i
 
 run_dino1   ldu     #dinorun1i
 
-DrawDino                            ; Draw Dino on screen and check collisions
-            stx     DinoYPos        ; save where we're at
+DrawDino                                    ; Draw Dino on screen and check collisions
+            stx     DinoYPos                ; save where we're at
 LoopDino    
             ldd     ,u++
             cmpa    #$AA
@@ -1163,7 +1195,7 @@ LoopDino
             comb
             std     ,x+
 SkipColl1   
-            lda     TempByte+1      ; check for collision
+            lda     TempByte+1              ; check for collision
             beq     SkipColl2
             clra
             ora     OBST_TEMPOF+0,x
@@ -1173,7 +1205,7 @@ SkipColl1
             inc     CollFlag
             lda     JumpState
             beq     NoJump
-            inc     JumpState       ; put Dino back to where he was
+            inc     JumpState               ; put Dino back to where he was
 NoJump
             bra     HandleCollision
 SkipColl2   
@@ -1195,6 +1227,9 @@ doneDino
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Collision Handler                                                  *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HandleCollision
@@ -1223,23 +1258,26 @@ CollDone
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Game Over                                                          *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,x                                                      *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doGameOver
 doGameOver
-            lda     $FF23               ; turn off music
+            lda     $FF23                   ; turn off music
             anda    #%11110111
             sta     $FF23
             
-            ldx     #gameover           ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0F0B    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #gameover               ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0F0B        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
             
             jsr     HandleHigh
             
-            ldx     #$5000              ; hang tight to clear keys and buttons
+            ldx     #$5000                  ; hang tight to clear keys and buttons
 DelayLoop   leax    -1,x
             bne     DelayLoop
             
@@ -1268,15 +1306,18 @@ DoneEnd
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Demo Over                                                          *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doDemoOver
 doDemoOver
-            clr     Timer               ; reset timer for timeout
+            clr     Timer                   ; reset timer for timeout
             clr     DemoMode
             clr     CollFlag
-            
-MoreInput   jsr     CheckInput
+MoreInput   
+            jsr     CheckInput
             jsr     HandleTime
             lda     Timer
             cmpa    #$60
@@ -1299,6 +1340,9 @@ ContDemo
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Initialize Variables                                               *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,d,x                                                    *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          InitVars
@@ -1318,7 +1362,6 @@ InitVars
             clr     JumpState
             clr     GameLevel
             clr     PauseState
-            ;clr     DinoBot
             clr     TotDist
             clr     TotDist+1
             clr     DinoIsGod
@@ -1327,10 +1370,8 @@ InitVars
             clr     curobst3
             clr     curobst4
             
-            lda     #30             ; newobheight
-            ;sta     newobheight
-            ldb     #12             ; newmntspeed
-            ;sta     newmntspeed
+            lda     #30                     ; newobheight
+            ldb     #12                     ; newmntspeed
             std     newobheight
             clr     obstaclechk
             rts
@@ -1340,75 +1381,78 @@ InitVars
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Check joystick button                                              *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ChckButton
 ChckButton  
-            lda     PauseState      ; game currently paused? 
+            lda     PauseState              ; game currently paused? 
             bne     ChckPause
-            lda     KeyFlag         ; still processing keystroke?
+            lda     KeyFlag                 ; still processing keystroke?
             bne     ButtDone
-            lda     JumpState       ; already in jump cycle?
+            lda     JumpState               ; already in jump cycle?
             bne     ButtDone
             
-            lda     #$FF            ; Mask keystrokes
+            lda     #$FF                    ; mask keystrokes
             sta     $FF02
-            lda     $FF00           ; load PIA0 state
-            anda    #%00000010      ; check left-joystick button-1
+            lda     $FF00                   ; load PIA0 state
+            anda    #%00000010              ; check left-joystick button-1
             beq     SetJump
-            lda     $FF00           ; load PIA0 state
-            anda    #%00000001      ; check right-joystick button-1
+            lda     $FF00                   ; load PIA0 state
+            anda    #%00000001              ; check right-joystick button-1
             bne     NextButt
 SetJump            
-            lda     #JUMP_FRAMES    ; 15-frames in jump animation
+            lda     #JUMP_FRAMES            ; 15-frames in jump animation
             sta     JumpState
-            bra     ClearDuck       ; go clear ducking status
+            bra     ClearDuck               ; go clear ducking status
 JmpButtDone            
             rts
 NextButt    
-            lda     DuckState       ; currently in a duck state?
+            lda     DuckState               ; currently in a duck state?
             bne     ButtDone
             lda     KeyFlag
             bne     ButtDone
             
-            lda     #$FF            ; Mask keystrokes
+            lda     #$FF                    ; Mask keystrokes
             sta     $FF02
             lda     $FF00
-            anda    #%00001000      ; check left-joystick button-2
+            anda    #%00001000              ; check left-joystick button-2
             beq     SetDuck
-            lda     $FF00           ; load PIA0 state
-            anda    #%00000100      ; check right-joystick button-2
+            lda     $FF00                   ; load PIA0 state
+            anda    #%00000100              ; check right-joystick button-2
             bne     ClearDuck
 SetDuck            
             lda     #01 
-            sta     DuckState       ; setup Dino ducking
+            sta     DuckState               ; setup Dino ducking
             bra     ButtDone
 ClearDuck           
-            lda     #04             ; need to clear ani-frame above duck
+            lda     #04                     ; need to clear ani-frame above duck
             sta     duckframe
             bra     ButtDone
 ChckPause
             clr     ButtonFlag
-            lda     #$FF            ; Mask keystrokes
+            lda     #$FF                    ; mask keystrokes
             sta     $FF02
-            lda     $FF00           ; load PIA0 state
-            anda    #%00000010      ; check left-joystick button-1
+            lda     $FF00                   ; load PIA0 state
+            anda    #%00000010              ; check left-joystick button-1
             beq     GotButt1
-            lda     $FF00           ; load PIA0 state
-            anda    #%00000001      ; check right-joystick button-1
+            lda     $FF00                   ; load PIA0 state
+            anda    #%00000001              ; check right-joystick button-1
             bne     CheckButt2
 GotButt1            
             inc     ButtonFlag
             clr     DuckState
             bra     ClearDuck
 CheckButt2  
-            lda     #$FF            ; Mask keystrokes
+            lda     #$FF                    ; mask keystrokes
             sta     $FF02
-            lda     $FF00           ; load PIA0 state
-            anda    #%00001000      ; check left-joystick button-1
+            lda     $FF00                   ; load PIA0 state
+            anda    #%00001000              ; check left-joystick button-1
             beq     GotButt2
-            lda     $FF00           ; load PIA0 state
-            anda    #%00000100      ; check right-joystick button-2
+            lda     $FF00                   ; load PIA0 state
+            anda    #%00000100              ; check right-joystick button-2
             bne     ButtDone
 GotButt2            
             inc     ButtonFlag
@@ -1419,21 +1463,24 @@ ButtDone
 
 ;*******************************************************************************
 ;*                                                                             *
-;*          Check Keyboard                                                     *
+;*          Check Keyboard (raw matrix switches)                               *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
-;{
+;{          ChckKeybd
 ChckKeybd   
             clr     KeyFlag  
 CheckSpace
-            lda     #$7F            ; first check <space> with joy buttons
+            lda     #$7F                    ; first check <space> with joy buttons
             sta     $FF02
             lda     $FF00
             anda    #%00001000
             coma
             sta     KeyFlag
             beq     CheckEnter
-            lda     #$FF            ; mask off keystrokes (just joy buttons)
+            lda     #$FF                    ; mask off keystrokes (just joy buttons)
             sta     $FF02
             lda     $FF00
             anda    #%00001000
@@ -1451,7 +1498,7 @@ CheckSpace
             inc     KeyFlag
             bra     DoneKeybd
 ClearDuck2            
-            lda     #04             ; need to clear ani-frame above duck
+            lda     #04                     ; need to clear ani-frame above duck
             sta     duckframe
             rts
 CheckEnter
@@ -1467,7 +1514,7 @@ CheckEnter
             bne     ClearDuck2
             
             lda     #01 
-            sta     DuckState       ; setup Dino ducking
+            sta     DuckState               ; setup Dino ducking
             inc     KeyFlag
 DoneKeybd   
             rts
@@ -1477,6 +1524,9 @@ DoneKeybd
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Pause Game (other)                                                 *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,x                                                      *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          otherPause
@@ -1487,34 +1537,34 @@ otherPause
             
             inc     PauseState
             
-            com     CipherTXT
+            com     CipherTXT               ; set cipher mode
             
-            ldx     #othertxt1          ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0F02    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #othertxt1              ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0F02        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
             
-            ldx     #othertxt2          ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$1083    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #othertxt2              ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$1083        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
             
-            com     CipherTXT
+            com     CipherTXT               ; reset cipher mode
             
             jsr     WaitForInput
             clr     PauseState
             
-            ldx     #blank              ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0F00    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #blank                  ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0F00        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
             
-            ldx     #VID_START+$1080    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #VID_START+$1080        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; Go print text
             
             lda     MusicFlag
             bne     DoneOtherP
@@ -1529,7 +1579,10 @@ DoneOtherP
 
 ;*******************************************************************************
 ;*                                                                             *
-;*          Other Keys (POLCAT with debounce                                   *
+;*          Other Keys (POLCAT with debounce)                                  *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x                                                    *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          OtherKeys
@@ -1538,14 +1591,14 @@ OtherKeys
             sta     TempByte
             
             clr     KeyFlag
-            jsr     [POLCAT]        ; grab another keystroke
-            beq     DoneOther       ; nothing in buffer - let's bail
+            jsr     [POLCAT]                ; grab another keystroke
+            beq     DoneOther               ; nothing in buffer - let's bail
             clr     DinoBot
-            sta     KeyFlag         ; set keystroke status
-            cmpa    #$20            ; <space> press?
+            sta     KeyFlag                 ; set keystroke status
+            cmpa    #$20                    ; <space> press?
             beq     CheckMkey
             
-            ldb     cipher          ; hmmmmmm
+            ldb     cipher                  ; hmmmmmm
             rolb
             eorb    cipher
             eora    cipher+1
@@ -1581,7 +1634,7 @@ FlashLoop
 CheckKeys            
             lda     KeyFlag
 CheckMkey
-            cmpa    #77             ; 'M' keystroke
+            cmpa    #77                     ; 'M' keystroke
             bne     CheckPkey
             com     MusicFlag
             lda     $FF23
@@ -1589,10 +1642,10 @@ CheckMkey
             sta     $FF23
             rts
 CheckPkey            
-            cmpa    #80             ; 'P' keystroke
+            cmpa    #80                     ; 'P' keystroke
             beq     doPause
 CheckRArr   
-            cmpa    #09             ; 'Right-Arrow' keystroke
+            cmpa    #09                     ; 'Right-Arrow' keystroke
             bne     DoneOther
             jsr     GetTune
             rts
@@ -1607,6 +1660,9 @@ DoneOther
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Pause Game                                                         *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,x                                                      *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doPause
@@ -1617,20 +1673,20 @@ doPause
             
             inc     PauseState
             
-            ldx     #gamepaused         ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0F0A    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #gamepaused             ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0F0A        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
             
             jsr     WaitForInput
             clr     PauseState
             
-            ldx     #blank              ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0F00    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #blank                  ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0F00        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
             
             lda     MusicFlag
             bne     DonePause
@@ -1646,6 +1702,9 @@ DonePause
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Time Handler                                                       *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : x                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HandleTime
@@ -1660,6 +1719,9 @@ HandleTime
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Check Input (Joystick or Keyboard)                                 *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          CheckInput
@@ -1677,7 +1739,6 @@ CheckInput
 SetInput
             inc     InputFlag
             clr     ButtonFlag
-            ;clr     JumpState
             clr     DuckState
 DoneInput            
             rts
@@ -1687,6 +1748,9 @@ DoneInput
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Wait For Input                                                     *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          WaitForInput
@@ -1701,7 +1765,7 @@ GetInput
             lda     InputFlag
             beq     WaitForInput
 DoneWait    
-            lda     #04             ; need to clear ani-frame above duck
+            lda     #04                     ; need to clear ani-frame above duck
             sta     duckframe
             clr     ButtonFlag
             clr     PauseState
@@ -1713,11 +1777,14 @@ DoneWait
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Score Handler - using a decade counter method                      *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x                                                    *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ScoreHandle
 ScoreHandle
-            dec     cyclescore      ; check if we're ready
+            dec     cyclescore              ; check if we're ready
             bne     ScoreChk
             lda     #SCOR_CYCLE
             sta     cyclescore
@@ -1726,7 +1793,7 @@ ScoreHandle
             abx
             stx     TotDist
 CountScore            
-            inc     ScrUnit         ; handle units place
+            inc     ScrUnit                 ; handle units place
             ldb     ScrUnit
             stb     ScoreTemp
             lda     #$0A
@@ -1736,7 +1803,7 @@ CountScore
             bne     ScoreChk
             clr     ScrUnit
 
-            inc     ScrTen          ; handle tens place
+            inc     ScrTen                  ; handle tens place
             ldb     ScrTen
             stb     ScoreTemp
             lda     #$09
@@ -1746,7 +1813,7 @@ CountScore
             bne     ScoreChk
             clr     ScrTen
 
-            inc     ScrHund         ; handle hundreds place
+            inc     ScrHund                 ; handle hundreds place
             ldb     ScrHund
             stb     ScoreTemp
             lda     #$08
@@ -1756,7 +1823,7 @@ CountScore
             bne     ScoreChk
             clr     ScrHund
 
-            inc     ScrThou         ; handle thousandths place
+            inc     ScrThou                 ; handle thousandths place
             ldb     ScrThou
             stb     ScoreTemp
             lda     #$07
@@ -1766,7 +1833,7 @@ CountScore
             bne     ScoreChk
             clr     ScrThou
 
-            inc     ScrTenTh        ; handle ten-thousandths place
+            inc     ScrTenTh                ; handle ten-thousandths place
             ldb     ScrTenTh
             stb     ScoreTemp
             lda     #$06
@@ -1775,7 +1842,7 @@ CountScore
             cmpb    #$0A
             bne     ScoreChk
             clr     ScrTenTh
-ScoreChk                            ; done with scoreboard update
+ScoreChk                                    ; done with scoreboard update
             bsr     HandleLevel
             rts                     
 ;}
@@ -1790,17 +1857,17 @@ ScoreChk                            ; done with scoreboard update
 ;*******************************************************************************
 ;{          ScoreChange
 ScoreChange 
-            ldu     #SCORE_START    ; get start of scoreboard
-            leau    a,u             ; offset scoreboard position
-            ldb     ScoreTemp       ; get temp score value
-            cmpb    #$0A            ; are we at '10'?
-            bne     ScoreCont       ; go do the digit
-            clrb                    ; reset to zero
+            ldu     #SCORE_START            ; get start of scoreboard
+            leau    a,u                     ; offset scoreboard position
+            ldb     ScoreTemp               ; get temp score value
+            cmpb    #$0A                    ; are we at '10'?
+            bne     ScoreCont               ; go do the digit
+            clrb                            ; reset to zero
 ScoreCont   
-            lda     #8              ; 8-bytes per char
-            mul                     ; font x8-bytes
-            ldx     #numbers        ; get numbers font location
-            leax    d,x             ; store offset location
+            lda     #8                      ; 8-bytes per char
+            mul                             ; font x8-bytes
+            ldx     #numbers                ; get numbers font location
+            leax    d,x                     ; store offset location
             lda     #8
 MoreFont    
             ldb     ,x+
@@ -1816,6 +1883,9 @@ MoreFont
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Reset Score                                                        *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,u                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ResetScore
@@ -1835,7 +1905,6 @@ loopScore   lda     ,u+
             leax    26,x
             cmpx    #SCORE_START+$100
             blt     bigScore
-            
             clr     ScoreTemp
 ClearScore  
             lda     #$05
@@ -1843,7 +1912,6 @@ ClearScore
             bsr     ScoreChange
             dec     scoredigits
             bne     ClearScore
-            
             lda     #$05
             sta     scoredigits
 doneScore            
@@ -1854,11 +1922,14 @@ doneScore
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Level Handler                                                      *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,d,x                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HandleLevel
 HandleLevel
-            ldx     TotDist
+            ldx     TotDist                 ; get total distance (score)
 
             lda     GameLevel
             cmpa    #07
@@ -1875,92 +1946,72 @@ HandleLevel
             beq     Check3
             cmpa    #01
             beq     Check2
-Check1
+Check1                                      ; check level-1 done
             cmpx    #LEVEL_1
             blo     DoneLevel
             inc     GameLevel
 Handle1
-            lda     #30             ; newobheight
-            ;sta     newobheight
-            ldb     #11             ; newmntspeed
-            ;sta     newmntspeed
+            lda     #30                     ; newobheight
+            ldb     #11                     ; newmntspeed
             std     newobheight
-            ;lda     #00
-            ;sta     obstaclechk
-Check2            
+Check2                                      ; check level-2 done
             cmpx    #LEVEL_2
             blo     DoneLevel
             inc     GameLevel
 Handle2
-            lda     #28             ; newobheight
-            ;sta     newobheight
-            ldb     #10             ; newmntspeed
-            ;sta     newmntspeed
+            lda     #28                     ; newobheight
+            ldb     #10                     ; newmntspeed
             std     newobheight
             lda     #4
             sta     obstaclechk
             rts
-Check3
+Check3                                      ; check level-3 done
             cmpx    #LEVEL_3
             blo     DoneLevel
             inc     GameLevel
 Handle3
-            lda     #26             ; newobheight
-            ;sta     newobheight
-            ldb     #9              ; newmntspeed
-            ;sta     newmntspeed
+            lda     #26                     ; newobheight
+            ldb     #9                      ; newmntspeed
             std     newobheight
             lda     #8
             sta     obstaclechk
             rts
-Check4
+Check4                                      ; check level-4 done
             cmpx    #LEVEL_4
             blo     DoneLevel
             inc     GameLevel
-Handle4
-            lda     #24             ; newobheight
-            ;sta     newobheight
-            ldb     #8              ; newmntspeed
-            ;sta     newmntspeed
+Handle4 
+            lda     #24                     ; newobheight
+            ldb     #8                      ; newmntspeed
             std     newobheight
-            ;lda     #8
-            ;sta     obstaclechk
             rts
-Check5
+Check5                                      ; check level-5 done
             cmpx    #LEVEL_5
             blo     DoneLevel
             inc     GameLevel
 Handle5
-            lda     #24             ; newobheight
-            ;sta     newobheight
-            ldb     #7              ; newmntspeed
-            ;sta     newmntspeed
+            lda     #24                     ; newobheight
+            ldb     #7                      ; newmntspeed
             std     newobheight
             lda     #4
             sta     obstaclechk
             rts
-Check6
+Check6                                      ; check level-6 done
             cmpx    #LEVEL_6
             blo     DoneLevel
             inc     GameLevel
 Handle6
-            lda     #20             ; newobheight
-            ;sta     newobheight
-            ldb     #6              ; newmntspeed
-            ;sta     newmntspeed
+            lda     #20                     ; newobheight
+            ldb     #6                      ; newmntspeed
             std     newobheight
-            ;lda     #4
-            ;sta     obstaclechk
             rts             
-Check7
+Check7                                      ; check level-7 done
             cmpx    #LEVEL_7
             blo     DoneLevel
             inc     GameLevel
 Handle7
-            lda     #16             ; newobheight
-            ;sta     newobheight
-            ldb     #4              ; newmntspeed
-            ;sta     newmntspeed
+            lda     #16                     ; newobheight
+            ldb     #4                      ; newmntspeed
             std     newobheight
             lda     #12
             sta     obstaclechk
@@ -1972,6 +2023,9 @@ DoneLevel
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Handle High Score                                                  *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HandleHigh
@@ -2019,15 +2073,18 @@ DoneHScore
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Show High Score                                                    *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x                                                    *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HighScore
 ShowHigh
-            ldx     #highscore          ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #HIGH_SCORE         ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
+            ldx     #highscore              ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #HIGH_SCORE             ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
    
             lda     #03
             ldb     HScrTenTh
@@ -2054,17 +2111,20 @@ doneHigh
 ;*******************************************************************************
 ;*                                                                             *
 ;*          High Score Change - update high scoreboard                         *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,u                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HScoreChange
 HScoreChange 
-            ldu     #HIGH_SCORE     ; get start of scoreboard
-            leau    a,u             ; offset scoreboard position
+            ldu     #HIGH_SCORE             ; get start of scoreboard
+            leau    a,u                     ; offset scoreboard position
 HScoreCont   
-            lda     #8              ; 8-bytes per char
-            mul                     ; font x8-bytes
-            ldx     #numbers        ; get numbers font location
-            leax    d,x             ; store offset location
+            lda     #8                      ; 8-bytes per char
+            mul                             ; font x8-bytes
+            ldx     #numbers                ; get numbers font location
+            leax    d,x                     ; store offset location
             lda     #8
 HMoreFont    
             ldb     ,x+
@@ -2079,18 +2139,20 @@ HMoreFont
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Handle Title Page                                                  *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HandleTitle
 HandleTitle
             jsr     TitlePage
-
-            clr     DemoMode            ; make sure demo is clear
-            clr     Timer               ; reset timer for timeout
-            inc     DemoMode            ; get ready for demo mode
+            clr     DemoMode                ; make sure demo is clear
+            clr     Timer                   ; reset timer for timeout
+            inc     DemoMode                ; get ready for demo mode
             jsr     InitVars
-            
-CycleInput  jsr     CheckInput
+CycleInput  
+            jsr     CheckInput
             jsr     HandleTime
             lda     Timer
             cmpa    #$48
@@ -2099,9 +2161,7 @@ CycleInput  jsr     CheckInput
 ChckInput            
             lda     InputFlag
             beq     CycleInput
-            
             clr     DemoMode
-            
             jsr     InitVars
             jmp     NewGame
 
@@ -2111,73 +2171,69 @@ ChckInput
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Title Page                                                         *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : b,x                                                      *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          Title Page
 TitlePage   
-            jsr     ClearGraphics       ; clear screen first
-            ldb     #4			        ; GFX FADE SPEED (FRAMES)
-            stb     wvs+1
-            jsr     TitleGraphic        ; do title graphic
+            jsr     ClearGraphics           ; clear screen first
+            ldb     #4			            ; GFX fade speed (frames)
+            stb     wvs+1                   ; set plot speed (GFX)
+            jsr     TitleGraphic            ; do title graphic
             
-            ldb     #45			        ; TEXT PLOT SPEED (FRAMES)
-            stb     wvs+1
-            jsr     wvs                 ; Go print text
+            ldb     #45			            ; text plot speed (frames)
+            stb     wvs+1                   ; set plot speed (text)
+            jsr     wvs                     ; go wait vsyncs
 
-            ldx     #titletext          ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0A0A    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
-            jsr     wvs                 ; Go print text
+            ldx     #titletext              ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0A0A        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
+            jsr     wvs                     ; go wait vsyncs
 
-            ldx     #title1             ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0C0F    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
-            jsr     wvs                 ; Go print text
+            ldx     #title1                 ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0C0F        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
+            jsr     wvs                     ; go wait vsyncs
             
-            ;ldx     #title2             ; get title text memory index
             ldx     pfcredits
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0E08    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            ;jsr     PrintAtGr           ; Go print text
-            jsr     pfWord
-            jsr     wvs                 ; Go print text
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$0E08        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     pfWord                  ; go print text
+            jsr     wvs                     ; go wait vsyncs
             
-            ldx     #title3             ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$1106    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
-            jsr     wvs                 ; Go print text
+            ldx     #title3                 ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$1106        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
+            jsr     wvs                     ; go wait vsyncs
             
-            ;ldx     #title4             ; get title text memory index
             ldx     andcredits
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$124E    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            ;jsr     PrintAtGr           ; Go print text
-            jsr     andWord
-            jsr     wvs                 ; Go print text
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$124E        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     andWord                 ; go print text
+            jsr     wvs                     ; go wait vsyncs
             
-            ldx     #title5             ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$1347    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
-            jsr     wvs                 ; Go print text
+            ldx     #title5                 ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$1347        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
+            jsr     wvs                     ; go wait vsyncs
             
-            ldx     #title6             ; get title text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$1509    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
-            
-            ;jsr     WaitForInput        ; Wait for keystroke
-            ;jsr     ClearGraphics       ; Clear graphics page
+            ldx     #title6                 ; get title text memory index
+            stx     StringLoc               ; store in string location var
+            ldx     #VID_START+$1509        ; location to print on screen
+            stx     PrintAtLoc              ; store location to print at
+            jsr     PrintAtGr               ; go print text
 DoneTitle
             rts
 ;}
@@ -2186,6 +2242,9 @@ DoneTitle
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Title Graphic                                                      *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,u                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          TitleGraphic
@@ -2213,10 +2272,13 @@ xx          fcb     %11111111
 
 ;*******************************************************************************
 ;                                                                              *
-;*          WAIT FOR SOME VSYNCS                                               *
+;*          Wait for some V-Syncs                                              *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b                                                      *
 ;*                                                                             *
 ;*******************************************************************************
-;{
+;{          wvs
 wvs         
             ldb     #4
 vs          lda     $ff03
@@ -2230,35 +2292,38 @@ vs          lda     $ff03
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Print Routine - Graphics Screen                                    *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,y,u                                                *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          PrintAtGr
 PrintAtGr   
-            ldx     PrintAtLoc      ; grab screen location from memory variable
-            ldy     StringLoc       ; grab string location from memory variable
+            ldx     PrintAtLoc              ; grab screen location from memory variable
+            ldy     StringLoc               ; grab string location from memory variable
 PrintLoop            
-            lda     ,y+             ; grab first byte of string
-            beq     DonePrint       ; done with string, go to DonePrint
+            lda     ,y+                     ; grab first byte of string
+            beq     DonePrint               ; done with string, go to DonePrint
             inc     lettercount
 DoChar                  
-            anda    #%00111111      ; subtract 64 from ASCII value
-            ldb     CipherTXT       
-            beq     DoText
-            suba    #$0D
+            anda    #%00111111              ; subtract 64 from ASCII value
+            ldb     CipherTXT               ; check for cipher
+            beq     DoText                  ; cipher? no - go do text
+            suba    #$0D                    ; modify text
 DoText              
-            ldb     #08             ; 8-bytes per character
-            mul                     ; get our character index offset
-            ldu     #letters        ; memory index of font
-            leau    d,u             ; index font location
-            ldb     #08             ; 8-bytes per character
+            ldb     #08                     ; 8-bytes per character
+            mul                             ; get our character index offset
+            ldu     #letters                ; memory index of font
+            leau    d,u                     ; index font location
+            ldb     #08                     ; 8-bytes per character
 DoBytes
-            lda     ,u+             ; get character byte
-            sta     ,x              ; put byte on screen
-            leax    32,x            ; index 32-bytes on page (next line)
-            decb                    ; decrement byte counter
-            bne     DoBytes         ; go do more bytes
-            leax    -255,x          ; move screen index next char
-            bra     PrintLoop       ; go get another character
+            lda     ,u+                     ; get character byte
+            sta     ,x                      ; put byte on screen
+            leax    32,x                    ; index 32-bytes on page (next line)
+            decb                            ; decrement byte counter
+            bne     DoBytes                 ; go do more bytes
+            leax    -255,x                  ; move screen index next char
+            bra     PrintLoop               ; go get another character
 DonePrint
             rts
 
@@ -2270,12 +2335,14 @@ lettercount zmb     1
 ;*******************************************************************************
 ;*                                                                             *
 ;*          PF Title Word (hack for centering text)                            *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,u                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          pfWord
 pfWord
             ldx     PrintAtLoc
-            ;ldu     StringLoc
             ldu     #pfcredits
 bigPF       ldb     #16
 littlePF    lda     ,u+
@@ -2293,6 +2360,9 @@ DoneLetters
 ;*******************************************************************************
 ;*                                                                             *
 ;*          AND Title Word (hack for centering text)                           *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,u                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          andWord
@@ -2316,15 +2386,16 @@ DoneANDLet
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Scroll Obstacles                                                   *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,x,cc                                                   *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ScrollObst
 ScrollObst  dec     cyclescroll
-            bne     DonePrint       ; go to nearest rts - save lbne
+            bne     DonePrint               ; go to nearest rts - save lbne
             lda     #SCRL_CYCLE
             sta     cyclescroll
-            ;dec     cactusdist
-            ;dec     pterodist
 ObstLoop    
             ldx     #OBST_ROW
             leax    767,x
@@ -2422,6 +2493,9 @@ ScrollDone
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Check Obstacles - Animation Handler                                *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a,b,x,y                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          Check Obstacles
@@ -2459,9 +2533,9 @@ CheckPtero
             rts
 FlapPtero
             lda     PteroHPos
-            cmpa    #$F0            ; Ptero still off screen?
+            cmpa    #$F0                    ; Ptero still off screen?
             beq     DoneObChck
-            anda    #%00001111      ; Even 2-byte boundary?
+            anda    #%00001111              ; Even 2-byte boundary?
             bne     DoneObChck
             ldb     PteroHPos
             rorb                    
@@ -2499,6 +2573,9 @@ DoneObChck
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Get Entropy - attempt randomness                                   *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          GetEntropy
@@ -2518,7 +2595,7 @@ GetEntropy
 ;*                                                                             *
 ;*******************************************************************************
 ;{          InitRandom
-InitRandom  lda     $113            ;grab RNG seed (BASIC TIMER)
+InitRandom  lda     $113                    ;grab RNG seed (BASIC TIMER)
             bne     store_rng
             inca
 store_rng   sta     rndx+1
@@ -2531,7 +2608,8 @@ store_rng   sta     rndx+1
 ;*           Pseudo-Random Number Generator                                    * 
 ;*           ------------------------------------------------                  *
 ;*           Input  : none                                                     *
-;*           Output : a (8bit rnd)                                             *
+;*           Output : a (8bit RND)                                             *
+;*           Used   : a                                                        *
 ;*                                                                             *
 ;*******************************************************************************
 ;{          GetRandom
@@ -2559,14 +2637,14 @@ rndb        adda    #00
 ;*                                                                             *
 ;*******************************************************************************
 ;{          
-CipherTXT   zmb     1               ; Cipher char
-HScrUnit    zmb     1               ; High Scoreboard - units value
-HScrTen     zmb     1               ; High Scoreboard - tens value
-HScrHund    zmb     1               ; High Scoreboard - hundreds value
-HScrThou    zmb     1               ; High Scoreboard - thousandths value
-HScrTenTh   zmb     1               ; High Scoreboard - ten-thousandths value
-PrintAtLoc  zmb     2               ; Print  Location
-StringLoc   zmb     2               ; String location in memory (Print-At)
+CipherTXT   zmb     1                       ; Cipher char
+HScrUnit    zmb     1                       ; High Scoreboard - units value
+HScrTen     zmb     1                       ; High Scoreboard - tens value
+HScrHund    zmb     1                       ; High Scoreboard - hundreds value
+HScrThou    zmb     1                       ; High Scoreboard - thousandths value
+HScrTenTh   zmb     1                       ; High Scoreboard - ten-thousandths value
+PrintAtLoc  zmb     2                       ; Print  Location
+StringLoc   zmb     2                       ; String location in memory (Print-At)
 
 nointernet  fcn     'NO INTERNET'            
 gameover    fcn     'GAME OVER'
