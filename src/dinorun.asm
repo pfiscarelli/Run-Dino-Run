@@ -1234,23 +1234,23 @@ doneDino
 ;*******************************************************************************
 ;{          HandleCollision
 HandleCollision
-            lda     DinoIsGod
-            bne     CollDone
-            lda     CollFlag
-            beq     CollDone
+            lda     DinoIsGod               ; check for Easter Egg
+            bne     CollDone                ; enable? done with collision check
+            lda     CollFlag                ; already have a collision?
+            beq     CollDone                ; no? done with collision check
 KillDino    
-            jsr     doObstacle
-            lda     JumpState
-            cmpa    #$13
-            blo     SkipObst
-            jsr     doObstacle
+            jsr     doObstacle              ; go do obstacle (collision detect before obstacle moved)
+            lda     JumpState               ; check jump state
+            cmpa    #$13                    ; less than middle of jump?
+            blo     SkipObst                ; yes - skip another obstacle scroll
+            jsr     doObstacle              ; go do another obstacle scroll (collision detect before obstacle moved)
 SkipObst            
-            jsr     dinoBegEnd
-            lda     DemoMode
-            bne     doDemoOver
-            bra     doGameOver
+            jsr     dinoBegEnd              ; go do Dino end (dead) position
+            lda     DemoMode                ; check if we were in demo mode
+            bne     doDemoOver              ; yes? go do demo over
+            bra     doGameOver              ; always go to game over
 CollDone    
-            clr     CollFlag
+            clr     CollFlag                ; clear collision flag
             rts
 ;}
 
@@ -1278,17 +1278,17 @@ doGameOver
             jsr     HandleHigh
             
             ldx     #$5000                  ; hang tight to clear keys and buttons
-DelayLoop   leax    -1,x
-            bne     DelayLoop
+DelayLoop   leax    -1,x                    ; decrement index    
+            bne     DelayLoop               ; done? no - go loop more
             
-            clr     Timer
+            clr     Timer                   ; clear the timer
             
-OverInput   jsr     CheckInput
-            jsr     HandleTime
-            lda     Timer
-            cmpa    #$E1
-            blo     OverInputs
-            bra     ContDemo
+OverInput   jsr     CheckInput              ; go check for input
+            jsr     HandleTime              ; go handle timer
+            lda     Timer                   ; grab timer value
+            cmpa    #$E1                    ; arbitrary value of time passed
+            blo     OverInputs              ; not there yet? go check inputs
+            bra     ContDemo                ; 
 OverInputs            
             lda     InputFlag
             beq     OverInput            

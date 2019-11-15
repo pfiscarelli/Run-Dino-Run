@@ -17,8 +17,6 @@ set "SRC_PATH=%USERPROFILE%\Desktop\CoCo Development\RunDinoRun\src\"
 set "BIN_PATH=%USERPROFILE%\Desktop\CoCo Development\RunDinoRun\bin\"
 set "INC_PATH=%USERPROFILE%\Desktop\CoCo Development\RunDinoRun\src\include\"
 
-copy "c:\Users\Paul\Desktop\CoCo Development\RunDinoRun\src\include\*.*" "c:\Users\Paul\Desktop\lwtools\include\dinorun\*.*"
-
 :: Set filename to uppercase?
 :: Set line below equal to FALSE if not worried about uppercase only files
 set uppercase=TRUE

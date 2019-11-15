@@ -1300,23 +1300,23 @@
                       (C:\Users\Paul\Des):01234         ;*******************************************************************************
                       (C:\Users\Paul\Des):01235         ;{          HandleCollision
 2F54                  (C:\Users\Paul\Des):01236         HandleCollision
-2F54 963F             (C:\Users\Paul\Des):01237 [4]                 lda     DinoIsGod
-2F56 2619             (C:\Users\Paul\Des):01238 [3]                 bne     CollDone
-2F58 962D             (C:\Users\Paul\Des):01239 [4]                 lda     CollFlag
-2F5A 2715             (C:\Users\Paul\Des):01240 [3]                 beq     CollDone
+2F54 963F             (C:\Users\Paul\Des):01237 [4]                 lda     DinoIsGod               ; check for Easter Egg
+2F56 2619             (C:\Users\Paul\Des):01238 [3]                 bne     CollDone                ; enable? done with collision check
+2F58 962D             (C:\Users\Paul\Des):01239 [4]                 lda     CollFlag                ; already have a collision?
+2F5A 2715             (C:\Users\Paul\Des):01240 [3]                 beq     CollDone                ; no? done with collision check
 2F5C                  (C:\Users\Paul\Des):01241         KillDino    
-2F5C BD2D23           (C:\Users\Paul\Des):01242 [8]                 jsr     doObstacle
-2F5F 9622             (C:\Users\Paul\Des):01243 [4]                 lda     JumpState
-2F61 8113             (C:\Users\Paul\Des):01244 [2]                 cmpa    #$13
-2F63 2503             (C:\Users\Paul\Des):01245 [3]                 blo     SkipObst
-2F65 BD2D23           (C:\Users\Paul\Des):01246 [8]                 jsr     doObstacle
+2F5C BD2D23           (C:\Users\Paul\Des):01242 [8]                 jsr     doObstacle              ; go do obstacle (collision detect before obstacle moved)
+2F5F 9622             (C:\Users\Paul\Des):01243 [4]                 lda     JumpState               ; check jump state
+2F61 8113             (C:\Users\Paul\Des):01244 [2]                 cmpa    #$13                    ; less than middle of jump?
+2F63 2503             (C:\Users\Paul\Des):01245 [3]                 blo     SkipObst                ; yes - skip another obstacle scroll
+2F65 BD2D23           (C:\Users\Paul\Des):01246 [8]                 jsr     doObstacle              ; go do another obstacle scroll (collision detect before obstacle moved)
 2F68                  (C:\Users\Paul\Des):01247         SkipObst            
-2F68 BD2E57           (C:\Users\Paul\Des):01248 [8]                 jsr     dinoBegEnd
-2F6B 963C             (C:\Users\Paul\Des):01249 [4]                 lda     DemoMode
-2F6D 264C             (C:\Users\Paul\Des):01250 [3]                 bne     doDemoOver
-2F6F 2003             (C:\Users\Paul\Des):01251 [3]                 bra     doGameOver
+2F68 BD2E57           (C:\Users\Paul\Des):01248 [8]                 jsr     dinoBegEnd              ; go do Dino end (dead) position
+2F6B 963C             (C:\Users\Paul\Des):01249 [4]                 lda     DemoMode                ; check if we were in demo mode
+2F6D 264C             (C:\Users\Paul\Des):01250 [3]                 bne     doDemoOver              ; yes? go do demo over
+2F6F 2003             (C:\Users\Paul\Des):01251 [3]                 bra     doGameOver              ; always go to game over
 2F71                  (C:\Users\Paul\Des):01252         CollDone    
-2F71 0F2D             (C:\Users\Paul\Des):01253 [6]                 clr     CollFlag
+2F71 0F2D             (C:\Users\Paul\Des):01253 [6]                 clr     CollFlag                ; clear collision flag
 2F73 39               (C:\Users\Paul\Des):01254 [5]                 rts
                       (C:\Users\Paul\Des):01255         ;}
                       (C:\Users\Paul\Des):01256         
@@ -1344,17 +1344,17 @@
 2F8B BD3383           (C:\Users\Paul\Des):01278 [8]                 jsr     HandleHigh
                       (C:\Users\Paul\Des):01279                     
 2F8E 8E5000           (C:\Users\Paul\Des):01280 [3]                 ldx     #$5000                  ; hang tight to clear keys and buttons
-2F91 301F             (C:\Users\Paul\Des):01281 [4+1]   DelayLoop   leax    -1,x
-2F93 26FC             (C:\Users\Paul\Des):01282 [3]                 bne     DelayLoop
+2F91 301F             (C:\Users\Paul\Des):01281 [4+1]   DelayLoop   leax    -1,x                    ; decrement index    
+2F93 26FC             (C:\Users\Paul\Des):01282 [3]                 bne     DelayLoop               ; done? no - go loop more
                       (C:\Users\Paul\Des):01283                     
-2F95 0F35             (C:\Users\Paul\Des):01284 [6]                 clr     Timer
+2F95 0F35             (C:\Users\Paul\Des):01284 [6]                 clr     Timer                   ; clear the timer
                       (C:\Users\Paul\Des):01285                     
-2F97 BD31F7           (C:\Users\Paul\Des):01286 [8]     OverInput   jsr     CheckInput
-2F9A BD31F0           (C:\Users\Paul\Des):01287 [8]                 jsr     HandleTime
-2F9D 9635             (C:\Users\Paul\Des):01288 [4]                 lda     Timer
-2F9F 81E1             (C:\Users\Paul\Des):01289 [2]                 cmpa    #$E1
-2FA1 2502             (C:\Users\Paul\Des):01290 [3]                 blo     OverInputs
-2FA3 2038             (C:\Users\Paul\Des):01291 [3]                 bra     ContDemo
+2F97 BD31F7           (C:\Users\Paul\Des):01286 [8]     OverInput   jsr     CheckInput              ; go check for input
+2F9A BD31F0           (C:\Users\Paul\Des):01287 [8]                 jsr     HandleTime              ; go handle timer
+2F9D 9635             (C:\Users\Paul\Des):01288 [4]                 lda     Timer                   ; grab timer value
+2F9F 81E1             (C:\Users\Paul\Des):01289 [2]                 cmpa    #$E1                    ; arbitrary value of time passed
+2FA1 2502             (C:\Users\Paul\Des):01290 [3]                 blo     OverInputs              ; not there yet? go check inputs
+2FA3 2038             (C:\Users\Paul\Des):01291 [3]                 bra     ContDemo                ; 
 2FA5                  (C:\Users\Paul\Des):01292         OverInputs            
 2FA5 9621             (C:\Users\Paul\Des):01293 [4]                 lda     InputFlag
 2FA7 27EE             (C:\Users\Paul\Des):01294 [3]                 beq     OverInput            
