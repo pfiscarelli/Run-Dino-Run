@@ -458,10 +458,10 @@ playTune1   lda     #3
 ;*******************************************************************************
 ;{          doMonts
 doMonts
-            ldx     #MOUNT_LOC
-ddd         ldu     #pic+32
-            ldy     #$3b		            ;one less line (black definition line)
-mloop       ldd     1,x
+            ldx     #MOUNT_LOC              ; grab mountain column location
+ddd         ldu     #pic+32                 ; load our bitmap pointer
+            ldy     #$3b		            ; one less line (black definition line)
+mloop       ldd     1,x                     ; do a full scan line
             std     ,x
             ldd     3,x
             std     2,x
@@ -500,7 +500,7 @@ mloop       ldd     1,x
             leau    64,u	
             leax    32,x
             leay    -1,y
-            bne     mloop
+            bne     mloop                   ; done? no - go do more
 
             lda     ddd+2
             inca
@@ -520,12 +520,12 @@ mloop       ldd     1,x
 ;*******************************************************************************
 ;{          NewMonts
 NewMonts    
-            lda     #$3c
+            lda     #$3c                    ; load mountain height (scan lines)
 
-picptr      ldx     #pic
-            ldy     #MOUNT_LOC
-next        ldu     ,x
-            stu     ,y
+picptr      ldx     #pic                    ; grab mountain column location
+            ldy     #MOUNT_LOC              ; grab screen location to put bytes
+next        ldu     ,x                      ; get mountain bytes
+            stu     ,y                      ; do a whole scan line
             ldu     2,x
             stu     2,y
             ldu     4,x
@@ -558,10 +558,10 @@ next        ldu     ,x
             stu     30,y
             leax    64,x
             leay    32,y
-            deca
-            bne     next
+            deca                            ; decrement scan line count
+            bne     next                    ; done? no - go do some more
 
-stor        inc     picptr+2
+stor        inc     picptr+2                ; increment our pointer (self-modifying)
             rts
 ;}
 
@@ -576,35 +576,35 @@ stor        inc     picptr+2
 ;*******************************************************************************
 ;{          doDemo
 doDemo
-            jsr     StageGame
-DemoMain
-            jsr     HandleTime
-            jsr     CheckInput
-            lda     InputFlag
-            beq     DemoCont
-            clr     InputFlag
-            clr     DemoMode
-            jsr     InitVars
-            jmp     NewGame
+            jsr     StageGame               ; go handle staging game
+DemoMain    
+            jsr     HandleTime              ; go handle time
+            jsr     CheckInput              ; go check for user input
+            lda     InputFlag               ; grab input flag
+            beq     DemoCont                ; input set? no - continue demo
+            clr     InputFlag               ; clear the flag
+            clr     DemoMode                ; reset demo mode flag
+            jsr     InitVars                ; go initialize vars
+            jmp     NewGame                 ; go start new game
 DemoCont            
-            dec     cyclegame
-            bne     DemoMore
-            lda     #GAME_CYCLE
-            sta     cyclegame
-            jsr     ScoreHandle
-            jsr     DemoControls
-            jsr     doDino
-            jsr     HandleCollision
-            dec     cyclemount
-            bne     DemoMain
-            lda     newmntspeed
-            sta     cyclemount
-            jsr     doMonts
+            dec     cyclegame               ; cycle game counter
+            bne     DemoMore                ; not zero? go do more
+            lda     #GAME_CYCLE             ; reset game counter
+            sta     cyclegame               ; store game counter
+            jsr     ScoreHandle             ; go handle score
+            jsr     DemoControls            ; go handle demo controls
+            jsr     doDino                  ; go animate Dino
+            jsr     HandleCollision         ; go handle collisions
+            dec     cyclemount              ; cycle mountain counter
+            bne     DemoMain                ; at zero? no - loop to Main
+            lda     newmntspeed             ; get mountain speed
+            sta     cyclemount              ; reset mountain counter
+            jsr     doMonts                 ; go do mountains
 DemoMore
-            jsr     doGround
-            jsr     doObstacle
+            jsr     doGround                ; go draw some ground
+            jsr     doObstacle              ; go handle obstacles
 DemoDone    
-            bra     DemoMain
+            bra     DemoMain                ; always loop demo main
             rts
 ;}
 
@@ -823,19 +823,19 @@ ContGround
 ;*******************************************************************************
 ;{          doGround
 doGround
-            dec     groundcount
-            bne     doneGround
-            lda     #GRND_CONT
-            sta     groundcount
-            jsr     GetRandom
-            ora     #%00111100
-            sta     VID_START+$1AC0
-            sta     VID_START+$1AE1
-            sta     VID_START+$1AC2
-            coma
-            sta     VID_START+$1AE0
-            sta     VID_START+$1AC1
-            sta     VID_START+$1AE2
+            dec     groundcount             ; cycle ground byte counter
+            bne     doneGround              ; ready to add ground? no - go bail
+            lda     #GRND_CONT              ; reset ground cycles
+            sta     groundcount             ; store it
+            jsr     GetRandom               ; source random bits
+            ora     #%00111100              ; create pattern
+            sta     VID_START+$1AC0         ; place off screen
+            sta     VID_START+$1AE1         ; place in temp space
+            sta     VID_START+$1AC2         ; place off screen
+            coma                            ; flip all bits
+            sta     VID_START+$1AE0         ; place in temp space
+            sta     VID_START+$1AC1         ; place off screen
+            sta     VID_START+$1AE2         ; place in temp space
 doneGround  
             rts
 ;}
