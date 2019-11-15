@@ -1388,10 +1388,10 @@ InitVars
 ;*******************************************************************************
 ;{          ChckButton
 ChckButton  
-            lda     PauseState              ; game currently paused? 
-            bne     ChckPause           
+            lda     PauseState              ; grab pause state flag
+            bne     ChckPause               ; currently paused? yes - go handle it
             lda     KeyFlag                 ; still processing keystroke?
-            bne     ButtDone
+            bne     ButtDone                ; yes? go handle done
             lda     JumpState               ; already in jump cycle?
             bne     ButtDone
             
@@ -1399,7 +1399,7 @@ ChckButton
             sta     $FF02                   ; set bits high
             lda     $FF00                   ; load PIA0 state
             anda    #%00000010              ; check left-joystick button-1
-            beq     SetJump
+            beq     SetJump                 ; button pushed? go set jump
             lda     $FF00                   ; load PIA0 state
             anda    #%00000001              ; check right-joystick button-1
             bne     NextButt
@@ -1411,51 +1411,51 @@ JmpButtDone
             rts
 NextButt    
             lda     DuckState               ; currently in a duck state?
-            bne     ButtDone
-            lda     KeyFlag
-            bne     ButtDone
+            bne     ButtDone                ; yes? go handle done
+            lda     KeyFlag                 ; grab keyboard flag
+            bne     ButtDone                ; something in buffer? go handle done
             
             lda     #$FF                    ; Mask keystrokes
-            sta     $FF02
-            lda     $FF00
+            sta     $FF02                   ; push outputs
+            lda     $FF00                   ; grab inputs
             anda    #%00001000              ; check left-joystick button-2
-            beq     SetDuck
+            beq     SetDuck                 ; button pushed? go set it
             lda     $FF00                   ; load PIA0 state
             anda    #%00000100              ; check right-joystick button-2
-            bne     ClearDuck
+            bne     ClearDuck               ; button pushed? go clear animation frames
 SetDuck            
-            lda     #01 
+            lda     #01                     ; set duck state flag
             sta     DuckState               ; setup Dino ducking
-            bra     ButtDone
+            bra     ButtDone                ; always go handle done
 ClearDuck           
             lda     #04                     ; need to clear ani-frame above duck
-            sta     duckframe
-            bra     ButtDone
+            sta     duckframe               ; store duck frame value
+            bra     ButtDone                ; always go handle done
 ChckPause
-            clr     ButtonFlag
+            clr     ButtonFlag              ; clear any buttons
             lda     #$FF                    ; mask keystrokes
-            sta     $FF02
+            sta     $FF02                   ; push outputs
             lda     $FF00                   ; load PIA0 state
             anda    #%00000010              ; check left-joystick button-1
-            beq     GotButt1
+            beq     GotButt1                ; button pushed? yes - go handle button state
             lda     $FF00                   ; load PIA0 state
             anda    #%00000001              ; check right-joystick button-1
-            bne     CheckButt2
+            bne     CheckButt2              ; button pushed? no - go check next button
 GotButt1            
-            inc     ButtonFlag
-            clr     DuckState
-            bra     ClearDuck
+            inc     ButtonFlag              ; set button flag
+            clr     DuckState               ; clear duck state
+            bra     ClearDuck               ; always go clear duck state
 CheckButt2  
             lda     #$FF                    ; mask keystrokes
-            sta     $FF02
+            sta     $FF02                   ; push outputs
             lda     $FF00                   ; load PIA0 state
             anda    #%00001000              ; check left-joystick button-1
-            beq     GotButt2
+            beq     GotButt2                ; button pushed? yes - go handle button state
             lda     $FF00                   ; load PIA0 state
             anda    #%00000100              ; check right-joystick button-2
-            bne     ButtDone
+            bne     ButtDone                ; button pushed? no - go to done
 GotButt2            
-            inc     ButtonFlag
+            inc     ButtonFlag              ; set button flag
 ButtDone    
             rts
 ;}
@@ -1471,51 +1471,51 @@ ButtDone
 ;*******************************************************************************
 ;{          ChckKeybd
 ChckKeybd   
-            clr     KeyFlag  
+            clr     KeyFlag                 ; clear any keystrokes 
 CheckSpace
             lda     #$7F                    ; first check <space> with joy buttons
-            sta     $FF02
-            lda     $FF00
-            anda    #%00001000
-            coma
-            sta     KeyFlag
-            beq     CheckEnter
+            sta     $FF02                   ; push outputs
+            lda     $FF00                   ; grab inputs
+            anda    #%00001000              ; check bit
+            coma                            ; invert it
+            sta     KeyFlag                 ; store keystroke in key flag
+            beq     CheckEnter              ; nothing stored? go check <enter> key
             lda     #$FF                    ; mask off keystrokes (just joy buttons)
-            sta     $FF02
-            lda     $FF00
-            anda    #%00001000
-            anda    KeyFlag
-            beq     CheckEnter
+            sta     $FF02                   ; push outputs
+            lda     $FF00                   ; grab inputs
+            anda    #%00001000              ; check bit
+            anda    KeyFlag                 ; check against key flag
+            beq     CheckEnter              ; nothing? go check <enter> key
             
-            lda     JumpState
-            bne     CheckEnter
-            lda     #JUMP_FRAMES
-            sta     JumpState
-            clr     DuckState
-            clr     <cipher
-            clr     <cipher+1
-            clr     KeyFlag
-            inc     KeyFlag
-            bra     DoneKeybd
+            lda     JumpState               ; grab jump state
+            bne     CheckEnter              ; current jump? yes - go check <enter> key
+            lda     #JUMP_FRAMES            ; grab jump frame count
+            sta     JumpState               ; set it
+            clr     DuckState               ; clear duck state
+            clr     <cipher                 ; jump clears cipher MSB
+            clr     <cipher+1               ; jump clears cipher LSB
+            clr     KeyFlag                 ; clear keyboard flag
+            inc     KeyFlag                 ; set keyboard flag to 1
+            bra     DoneKeybd               ; always done with keyboard check
 ClearDuck2            
             lda     #04                     ; need to clear ani-frame above duck
-            sta     duckframe
+            sta     duckframe               ; store it
             rts
 CheckEnter
-            clr     KeyFlag
-            lda     DuckState
-            bne     DoneKeybd
-            lda     JumpState
-            bne     DoneKeybd
-            lda     #$FE
-            sta     $FF02
-            lda     $FF00
-            anda    #%01000000
-            bne     ClearDuck2
+            clr     KeyFlag                 ; clear keyboard flag
+            lda     DuckState               ; get duck state
+            bne     DoneKeybd               ; in duck state? yes - go to done
+            lda     JumpState               ; get jump state
+            bne     DoneKeybd               ; in jump state? yes - go to done
+            lda     #$FE                    ; set mask (<enter> key column-0)
+            sta     $FF02                   ; push outputs
+            lda     $FF00                   ; grab inputs
+            anda    #%01000000              ; check <enter> key row-6
+            bne     ClearDuck2              ; not pressed? go clear duck state
             
-            lda     #01 
+            lda     #01                     ; set duck flag
             sta     DuckState               ; setup Dino ducking
-            inc     KeyFlag
+            inc     KeyFlag                 ; set keyboard flag
 DoneKeybd   
             rts
 ;}
@@ -1870,11 +1870,11 @@ ScoreCont
             leax    d,x                     ; store offset location
             lda     #8
 MoreFont    
-            ldb     ,x+
-            stb     ,u
-            leau    32,u
-            deca
-            bne     MoreFont
+            ldb     ,x+                     ; get font byte, index font pointer
+            stb     ,u                      ; store on screen
+            leau    32,u                    ; cycle index - next scan line
+            deca                            ; decrement char counter
+            bne     MoreFont                ; done with char? no - go do more
             rts
 ;}
 
@@ -2147,24 +2147,24 @@ HMoreFont
 ;*******************************************************************************
 ;{          HandleTitle
 HandleTitle
-            jsr     TitlePage
+            jsr     TitlePage               ; go handle title page
             clr     DemoMode                ; make sure demo is clear
             clr     Timer                   ; reset timer for timeout
             inc     DemoMode                ; get ready for demo mode
-            jsr     InitVars
+            jsr     InitVars                ; go init vars
 CycleInput  
-            jsr     CheckInput
-            jsr     HandleTime
-            lda     Timer
-            cmpa    #$48
-            blo     ChckInput
-            jmp     doDemo
+            jsr     CheckInput              ; go check for user input
+            jsr     HandleTime              ; go handle timer
+            lda     Timer                   ; grab timer value
+            cmpa    #$48                    ; check if arbitrary time has passed
+            blo     ChckInput               ; no? go check input
+            jmp     doDemo                  ; always go handle demo
 ChckInput            
-            lda     InputFlag
-            beq     CycleInput
-            clr     DemoMode
-            jsr     InitVars
-            jmp     NewGame
+            lda     InputFlag               ; grab input flag
+            beq     CycleInput              ; no input? go check again
+            clr     DemoMode                ; clear demo mode flag
+            jsr     InitVars                ; go init vars
+            jmp     NewGame                 ; always go handle new game
 
             rts
 ;}
