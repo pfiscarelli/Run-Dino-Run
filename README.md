@@ -21,11 +21,13 @@ The game was developed around Simon Jonassen's 3-voice saw-tooth music player. S
 
 One thing to keep in mind for those that may not be familiar with the TRS-80 Color Computer, there is no speciality hardware for graphics or sound - no sprites or hardware sound chip often found in similar 8-bit systems back in the 80's. This game is done all through the 6809 CPU.
 
-# Game Play
+## Game Play
 
 The object of this 'endless runner' style game is to navigate Dino and avoid the approaching obstacles. The two available controls are "Jump" with the Spacebar or joystick button-1, and "Duck" with the Enter/Return key or joystick button-2.
 
-# System Requirements
+Other controls include 'P' key for game pause, 'M' key for toggling music on/off, and 'Right-Arrow' key for next tune selection.
+
+## System Requirements
 
 The hardware requirement for the game is a TRS-80 Color Computer 3 with 128K of RAM. Despite using 'PMODE-4' graphics, the game does make use of the high-speed poke (1.79MHz) and the FIRQ interrupt for the music synthesizer.
 

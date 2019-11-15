@@ -436,7 +436,7 @@ playTune3   ldx     #dinotune3              ; default to tune-3
             ldd     ,x++                    ; get beginning 2 notes from pattern - cont            
             rts
 playTune2   ldx     #dinotune2              ; set index to tune-2
-            stx     <curnote+1              ; store notes in our pointer (self-mofifying)
+            stx     <curnote+1              ; store notes in our pointer (self-modifying)
             ldd     ,x++                    ; get beginning 2 notes from pattern - cont
             rts
 playTune1   lda     #03                     ; reset tune counter
@@ -710,16 +710,16 @@ ReallyDone
 ;*******************************************************************************
 ;{          StageGame
 StageGame            
-            jsr     ClearGraphics
-            jsr     doMoon
-            jsr     ResetScore
-            lda     FirstGame
-            beq     SkipHigh
-            jsr     ShowHigh
+            jsr     ClearGraphics           ; go clear graphic screen
+            jsr     doMoon                  ; go draw moon
+            jsr     ResetScore              ; go reset score
+            lda     FirstGame               ; grab first game played flag
+            beq     SkipHigh                ; first game? no high score to display
+            jsr     ShowHigh                ; go handle high score
 SkipHigh            
-            jsr     NewMonts         
-            jsr     NewGround
-            jsr     dinoBegEnd
+            jsr     NewMonts                ; go do new mountains
+            jsr     NewGround               ; go draw new ground
+            jsr     dinoBegEnd              ; go draw new Dino
 
             rts
 ;}
@@ -735,14 +735,14 @@ SkipHigh
 ;*******************************************************************************
 ;{          StartGame
 StartGame
-            jsr     GetRandom
-            anda    #%00000011
-            inca
-            sta     tuneselect
-            jsr     GetTune
+            jsr     GetRandom               ; go get a random value
+            anda    #%00000011              ; value between 0-3
+            inca                            ; increment it (now 1-4)
+            sta     tuneselect              ; store it in tune select (random tune)
+            jsr     GetTune                 ; go get new tune
             
-            lda     HScrUnit
-            bne     SkipInternet
+            lda     HScrUnit                ; grab units-place of high score
+            bne     SkipInternet            ; not zero? skip internet message
             
             ldx     #nointernet             ; get title text memory index
             stx     StringLoc               ; store in string location var
@@ -751,7 +751,7 @@ StartGame
             jsr     PrintAtGr               ; go print text
 
 SkipInternet
-            jsr     WaitForInput
+            jsr     WaitForInput            ; go wait for user input
             
             ldx     #blank                  ; get title text memory index
             stx     StringLoc               ; store in string location var
@@ -759,10 +759,10 @@ SkipInternet
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; Go print text
 
-            lda     #JUMP_FRAMES    
-            sta     JumpState
-            lda     MusicFlag
-            bne     ReturnMain
+            lda     #JUMP_FRAMES            ; get jump frames count
+            sta     JumpState               ; store it in jump state
+            lda     MusicFlag               ; get music enabled flag
+            bne     ReturnMain              ; currently enabled? no - go return to main
             lda     $FF23                   ; re-enable sound
             ora     #%00001000
             sta     $FF23
@@ -781,17 +781,17 @@ ReturnMain
 ;*******************************************************************************
 ;{          NewGround
 NewGround    
-            ldx     #GRND_POS
+            ldx     #GRND_POS               ; set index of ground scan line
 
 loopGround
-            jsr     GetRandom
-            ora     #%00111100
-            sta     32,x
-            coma
-            sta     ,x+
+            jsr     GetRandom               ; go get random value
+            ora     #%00111100              ; create more regular pattern
+            sta     32,x                    ; store it next scan line down
+            coma                            ; invert it
+            sta     ,x+                     ; store at current scan line, index to next byte column
             
             cmpx    #GRND_POS+DINO_XOFST    ; put some ground in temp space
-            blo     ContGround
+            blo     ContGround              
             cmpx    #GRND_POS+DINO_XOFST+2
             bhi     ContGround
             sta     SCRL_OFFSET+56,x       
@@ -1033,37 +1033,37 @@ doneCactus
 ;*******************************************************************************
 ;{          doPtero
 doPtero     
-            lda     PteroFlag
-            bne     skipPtero
-            lda     GameLevel
-            cmpa    #04
-            blo     SlowLevel
-            lda     #08
-            bra     StoreLow
+            lda     PteroFlag               ; grab pterodactyl flag
+            bne     skipPtero               ; already on screen? yes - go skip
+            lda     GameLevel               ; load game level
+            cmpa    #04                     ; at level 4 yet?
+            blo     SlowLevel               ; less than? go slow level
+            lda     #08                     ; load ptero offset
+            bra     StoreLow                ; always go low level
 SlowLevel   jsr     GetRandom               ; determine high or low flying
-            anda    #%00001000
-StoreLow    sta     PteroVPos
-            ldb     #32
-            mul
-            ldx     #PTERO_ROW
-            leax    NEWOB_OFFST,x
-            leax    d,x
-            ldy     #pterodactyl1
-loopPtero   lda     ,y+
-            beq     donePtero
-            sta     ,x+
-            lda     ,y+
-            sta     ,x+
-            lda     ,y+
-            sta     ,x
-            leax    30,x
-            bra     loopPtero
+            anda    #%00001000              ; offset may or may not be 8 scan lines
+StoreLow    sta     PteroVPos               ; store the position
+            ldb     #32                     ; 32-bytes per scan line
+            mul                             ; multiply it
+            ldx     #PTERO_ROW              ; get index of ptero row
+            leax    NEWOB_OFFST,x           ; offset it by new obstacle offset
+            leax    d,x                     ; offset by ptero row index
+            ldy     #pterodactyl1           ; get index of ptero sprite
+loopPtero   lda     ,y+                     ; get bytes
+            beq     donePtero               ; at the end of sprite? yes - go to done
+            sta     ,x+                     ; store byte on screen, move to next column
+            lda     ,y+                     ; get another byte, index sprite pointer
+            sta     ,x+                     ; store byte on screen, move to next column
+            lda     ,y+                     ; get another byte, index sprite pointer
+            sta     ,x                      ; store byte on screen
+            leax    30,x                    ; index to next scan line (minus bytes for sprite width)
+            bra     loopPtero               ; always loop for more
 donePtero   
             coma                            ; reset Dino position counter
-            sta     PteroHPos
-            sta     PteroFlag
-            lda     MINDIS_PTER
-            sta     pterodist 
+            sta     PteroHPos               ; store it
+            sta     PteroFlag               ; reset ptero on-screen flag
+            lda     MINDIS_PTER             ; get minimum distance for next sprite
+            sta     pterodist               ; store it
 skipPtero            
             rts
 ;}
@@ -1079,40 +1079,40 @@ skipPtero
 ;*******************************************************************************
 ;{          dinoBegEnd
 dinoBegEnd
-            lda     CollFlag
-            beq     BeginDino
-DeadDino
-            ldx     #DINO_START+DINO_XOFST
-            ldu     #dinodeadi
-            lda     JumpState
-            beq     dinoLoop
-            leax    JUMP_OFFSET,x
-            ldu     #jumpheight
-            lda     a,u
-            ldb     #32
-            mul
-            leax    d,x
-            dec     JumpState
-            ldu     #dinodeadji
-            bra     dinoLoop
+            lda     CollFlag                ; grab collision flag
+            beq     BeginDino               ; not set? go do begin Dino
+DeadDino                                    ; draw dead Dino
+            ldx     #DINO_START+DINO_XOFST  ; load index of Dino start
+            ldu     #dinodeadi              ; set pointer of dead Dino sprite
+            lda     JumpState               ; grab current jump state
+            beq     dinoLoop                ; not in jump frame? go to Dino draw loop
+            leax    JUMP_OFFSET,x           ; offset scan line by jump position
+            ldu     #jumpheight             ; get index current jump height
+            lda     a,u                     ; grab byte from that index
+            ldb     #32                     ; 32-bytes per scan line
+            mul                             ; multiply it
+            leax    d,x                     ; set new scan line offset
+            dec     JumpState               ; decrement jump state (collision happened before)
+            ldu     #dinodeadji             ; grab index of dead Dino jumping sprite
+            bra     dinoLoop                ; go to Dino draw loop
 BeginDino            
-            ldx     #DINO_START+DINO_XOFST-$60
-            ldu     #dinostandi
+            ldx     #DINO_START+DINO_XOFST-$60 ; set index of starting Dino
+            ldu     #dinostandi             ; set pointer of start Dino sprite
 dinoLoop
-            ldd     ,u++
-            cmpa    #$AA
-            beq     dinoDone
-            ora     OBST_TEMPOF+32,x
-            orb     OBST_TEMPOF+33,x
-            coma
-            comb
-            std     ,x      
-            lda     ,u+
-            ora     OBST_TEMPOF+34,x
-            coma
-            sta     2,x
-            leax    32,x
-            bra     dinoLoop
+            ldd     ,u++                    ; get two bytes, index sprite pointer
+            cmpa    #$AA                    ; at end of sprite?
+            beq     dinoDone                ; yes? go to done
+            ora     OBST_TEMPOF+32,x        ; need to mesh MSB with obstacle sprite
+            orb     OBST_TEMPOF+33,x        ; need to mesh LSB with obstacle sprite
+            coma                            ; invert MSB
+            comb                            ; invert LSB
+            std     ,x                      ; put bytes on screen
+            lda     ,u+                     ; get next column byte, index sprite pointer
+            ora     OBST_TEMPOF+34,x        ; mesh with obstacle byte
+            coma                            ; invert it
+            sta     2,x                     ; store it two byte columns over
+            leax    32,x                    ; index scan line
+            bra     dinoLoop                ; always loop Dino draw
 dinoDone            
             rts
 ;}
@@ -1288,19 +1288,19 @@ OverInput   jsr     CheckInput              ; go check for input
             lda     Timer                   ; grab timer value
             cmpa    #$E1                    ; arbitrary value of time passed
             blo     OverInputs              ; not there yet? go check inputs
-            bra     ContDemo                ; 
+            bra     ContDemo                ; go continue demo
 OverInputs            
-            lda     InputFlag
-            beq     OverInput            
+            lda     InputFlag               ; grab input flag
+            beq     OverInput               ; user input? no - go check again
             
-            jsr     InitVars
-            jsr     ClearGraphics
-            jsr     ShowHigh
-            lda     FirstGame
-            bne     DoneEnd
-            inc     FirstGame
+            jsr     InitVars                ; go init vars
+            jsr     ClearGraphics           ; go clear graphics
+            jsr     ShowHigh                ; go handle high score
+            lda     FirstGame               ; check first game played flag
+            bne     DoneEnd                 ; was it? no - done with game over
+            inc     FirstGame               ; increment first game playe flag
 DoneEnd
-            jmp     NewGame
+            jmp     NewGame                 ; go do new game
 ;}
 
 ;*******************************************************************************
@@ -1314,25 +1314,25 @@ DoneEnd
 ;{          doDemoOver
 doDemoOver
             clr     Timer                   ; reset timer for timeout
-            clr     DemoMode
-            clr     CollFlag
+            clr     DemoMode                ; reset demo mode flag
+            clr     CollFlag                ; clear collisions
 MoreInput   
-            jsr     CheckInput
-            jsr     HandleTime
-            lda     Timer
-            cmpa    #$60
-            blo     CheckInputs
-            bra     ContDemo
+            jsr     CheckInput              ; go check for input
+            jsr     HandleTime              ; go handle timer
+            lda     Timer                   ; grab timer value
+            cmpa    #$60                    ; arbitrary time passes
+            blo     CheckInputs             ; still less? yes - go check inputs
+            bra     ContDemo                ; always continue demo
 CheckInputs            
-            lda     InputFlag
-            beq     MoreInput
+            lda     InputFlag               ; grab input flag
+            beq     MoreInput               ; no input? go get check again
             
-            clr     InputFlag
-            clr     DemoMode
-            jsr     InitVars
-            jmp     NewGame
+            clr     InputFlag               ; clear input flag
+            clr     DemoMode                ; clear demo mode flag
+            jsr     InitVars                ; go init vars
+            jmp     NewGame                 ; go do new game
 ContDemo
-            jmp     HandleTitle
+            jmp     HandleTitle             ; go handle title screen
 
 ;}
 
@@ -1347,33 +1347,33 @@ ContDemo
 ;*******************************************************************************
 ;{          InitVars
 InitVars
-            ldx     #dinotune1
-            stx     <curnote+1
+            ldx     #dinotune1              ; set index to first tune
+            stx     <curnote+1              ; store notes in pointer (self modifying)
             
-            ldx     #pic+32
-            stx     >ddd+1
+            ldx     #pic+32                 ; load bitmap index
+            stx     >ddd+1                  ; store in pointer
             
-            ldx     #pic
-            stx     >picptr+1
+            ldx     #pic                    ; set index to mountain start
+            stx     >picptr+1               ; store in pointer
             
-            clr     CollFlag
-            clr     PteroFlag
-            clr     DuckState
-            clr     JumpState
-            clr     GameLevel
-            clr     PauseState
-            clr     TotDist
-            clr     TotDist+1
-            clr     DinoIsGod
-            clr     curobst1
-            clr     curobst2
-            clr     curobst3
-            clr     curobst4
+            clr     CollFlag                ; clear collisions
+            clr     PteroFlag               ; clear Pterodactyl flag
+            clr     DuckState               ; clear ducking state
+            clr     JumpState               ; clear jump state
+            clr     GameLevel               ; reset game level
+            clr     PauseState              ; reset pause state
+            clr     TotDist                 ; reset MSB distance (score)
+            clr     TotDist+1               ; reset LSB distance (score)
+            clr     DinoIsGod               ; reset Easter Egg
+            clr     curobst1                ; clear obstacle01 pointer (demo mode)
+            clr     curobst2                ; clear obstacle01 pointer (demo mode)
+            clr     curobst3                ; clear obstacle01 pointer (demo mode)
+            clr     curobst4                ; clear obstacle01 pointer (demo mode)
             
             lda     #30                     ; newobheight
             ldb     #12                     ; newmntspeed
-            std     newobheight
-            clr     obstaclechk
+            std     newobheight             ; store them as defaults
+            clr     obstaclechk             ; cleare obstacle check flag
             rts
 ;}            
 
@@ -1389,14 +1389,14 @@ InitVars
 ;{          ChckButton
 ChckButton  
             lda     PauseState              ; game currently paused? 
-            bne     ChckPause
+            bne     ChckPause           
             lda     KeyFlag                 ; still processing keystroke?
             bne     ButtDone
             lda     JumpState               ; already in jump cycle?
             bne     ButtDone
             
             lda     #$FF                    ; mask keystrokes
-            sta     $FF02
+            sta     $FF02                   ; set bits high
             lda     $FF00                   ; load PIA0 state
             anda    #%00000010              ; check left-joystick button-1
             beq     SetJump
@@ -1405,7 +1405,7 @@ ChckButton
             bne     NextButt
 SetJump            
             lda     #JUMP_FRAMES            ; 15-frames in jump animation
-            sta     JumpState
+            sta     JumpState               ; store it
             bra     ClearDuck               ; go clear ducking status
 JmpButtDone            
             rts
@@ -1531,11 +1531,11 @@ DoneKeybd
 ;*******************************************************************************
 ;{          otherPause
 otherPause
-            lda     $FF23
+            lda     $FF23                   ; turn off audio
             anda    #%11110111
             sta     $FF23
             
-            inc     PauseState
+            inc     PauseState              ; set pause state flag
             
             com     CipherTXT               ; set cipher mode
             
@@ -1553,8 +1553,8 @@ otherPause
             
             com     CipherTXT               ; reset cipher mode
             
-            jsr     WaitForInput
-            clr     PauseState
+            jsr     WaitForInput            ; go check for input
+            clr     PauseState              ; clear pause state
             
             ldx     #blank                  ; get title text memory index
             stx     StringLoc               ; store in string location var
@@ -1566,10 +1566,10 @@ otherPause
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; Go print text
             
-            lda     MusicFlag
-            bne     DoneOtherP
+            lda     MusicFlag               ; was music playing?
+            bne     DoneOtherP              ; no? go to done
             
-            lda     $FF23
+            lda     $FF23                   ; re-enable audio
             ora     #%00001000
             sta     $FF23
 DoneOtherP            

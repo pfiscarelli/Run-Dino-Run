@@ -502,7 +502,7 @@
 2AB8 EC81             (C:\Users\Paul\Des):00436 [5+3]               ldd     ,x++                    ; get beginning 2 notes from pattern - cont            
 2ABA 39               (C:\Users\Paul\Des):00437 [5]                 rts
 2ABB 8E65DE           (C:\Users\Paul\Des):00438 [3]     playTune2   ldx     #dinotune2              ; set index to tune-2
-2ABE 9FB2             (C:\Users\Paul\Des):00439 [5]                 stx     <curnote+1              ; store notes in our pointer (self-mofifying)
+2ABE 9FB2             (C:\Users\Paul\Des):00439 [5]                 stx     <curnote+1              ; store notes in our pointer (self-modifying)
 2AC0 EC81             (C:\Users\Paul\Des):00440 [5+3]               ldd     ,x++                    ; get beginning 2 notes from pattern - cont
 2AC2 39               (C:\Users\Paul\Des):00441 [5]                 rts
 2AC3 8603             (C:\Users\Paul\Des):00442 [2]     playTune1   lda     #03                     ; reset tune counter
@@ -776,16 +776,16 @@
                       (C:\Users\Paul\Des):00710         ;*******************************************************************************
                       (C:\Users\Paul\Des):00711         ;{          StageGame
 2C6A                  (C:\Users\Paul\Des):00712         StageGame            
-2C6A BD2A8E           (C:\Users\Paul\Des):00713 [8]                 jsr     ClearGraphics
-2C6D BD2DA2           (C:\Users\Paul\Des):00714 [8]                 jsr     doMoon
-2C70 BD32C0           (C:\Users\Paul\Des):00715 [8]                 jsr     ResetScore
-2C73 963A             (C:\Users\Paul\Des):00716 [4]                 lda     FirstGame
-2C75 2703             (C:\Users\Paul\Des):00717 [3]                 beq     SkipHigh
-2C77 BD33CB           (C:\Users\Paul\Des):00718 [8]                 jsr     ShowHigh
+2C6A BD2A8E           (C:\Users\Paul\Des):00713 [8]                 jsr     ClearGraphics           ; go clear graphic screen
+2C6D BD2DA2           (C:\Users\Paul\Des):00714 [8]                 jsr     doMoon                  ; go draw moon
+2C70 BD32C0           (C:\Users\Paul\Des):00715 [8]                 jsr     ResetScore              ; go reset score
+2C73 963A             (C:\Users\Paul\Des):00716 [4]                 lda     FirstGame               ; grab first game played flag
+2C75 2703             (C:\Users\Paul\Des):00717 [3]                 beq     SkipHigh                ; first game? no high score to display
+2C77 BD33CB           (C:\Users\Paul\Des):00718 [8]                 jsr     ShowHigh                ; go handle high score
 2C7A                  (C:\Users\Paul\Des):00719         SkipHigh            
-2C7A BD2B42           (C:\Users\Paul\Des):00720 [8]                 jsr     NewMonts         
-2C7D BD2CC6           (C:\Users\Paul\Des):00721 [8]                 jsr     NewGround
-2C80 BD2E57           (C:\Users\Paul\Des):00722 [8]                 jsr     dinoBegEnd
+2C7A BD2B42           (C:\Users\Paul\Des):00720 [8]                 jsr     NewMonts                ; go do new mountains
+2C7D BD2CC6           (C:\Users\Paul\Des):00721 [8]                 jsr     NewGround               ; go draw new ground
+2C80 BD2E57           (C:\Users\Paul\Des):00722 [8]                 jsr     dinoBegEnd              ; go draw new Dino
                       (C:\Users\Paul\Des):00723         
 2C83 39               (C:\Users\Paul\Des):00724 [5]                 rts
                       (C:\Users\Paul\Des):00725         ;}
@@ -801,14 +801,14 @@
                       (C:\Users\Paul\Des):00735         ;*******************************************************************************
                       (C:\Users\Paul\Des):00736         ;{          StartGame
 2C84                  (C:\Users\Paul\Des):00737         StartGame
-2C84 BD36C0           (C:\Users\Paul\Des):00738 [8]                 jsr     GetRandom
-2C87 8403             (C:\Users\Paul\Des):00739 [2]                 anda    #%00000011
-2C89 4C               (C:\Users\Paul\Des):00740 [2]                 inca
-2C8A 975D             (C:\Users\Paul\Des):00741 [4]                 sta     tuneselect
-2C8C BD2AA9           (C:\Users\Paul\Des):00742 [8]                 jsr     GetTune
+2C84 BD36C0           (C:\Users\Paul\Des):00738 [8]                 jsr     GetRandom               ; go get a random value
+2C87 8403             (C:\Users\Paul\Des):00739 [2]                 anda    #%00000011              ; value between 0-3
+2C89 4C               (C:\Users\Paul\Des):00740 [2]                 inca                            ; increment it (now 1-4)
+2C8A 975D             (C:\Users\Paul\Des):00741 [4]                 sta     tuneselect              ; store it in tune select (random tune)
+2C8C BD2AA9           (C:\Users\Paul\Des):00742 [8]                 jsr     GetTune                 ; go get new tune
                       (C:\Users\Paul\Des):00743                     
-2C8F B636E1           (C:\Users\Paul\Des):00744 [5]                 lda     HScrUnit
-2C92 260F             (C:\Users\Paul\Des):00745 [3]                 bne     SkipInternet
+2C8F B636E1           (C:\Users\Paul\Des):00744 [5]                 lda     HScrUnit                ; grab units-place of high score
+2C92 260F             (C:\Users\Paul\Des):00745 [3]                 bne     SkipInternet            ; not zero? skip internet message
                       (C:\Users\Paul\Des):00746                     
 2C94 8E36EA           (C:\Users\Paul\Des):00747 [3]                 ldx     #nointernet             ; get title text memory index
 2C97 BF36E8           (C:\Users\Paul\Des):00748 [6]                 stx     StringLoc               ; store in string location var
@@ -817,7 +817,7 @@
 2CA0 BD3508           (C:\Users\Paul\Des):00751 [8]                 jsr     PrintAtGr               ; go print text
                       (C:\Users\Paul\Des):00752         
 2CA3                  (C:\Users\Paul\Des):00753         SkipInternet
-2CA3 BD3215           (C:\Users\Paul\Des):00754 [8]                 jsr     WaitForInput
+2CA3 BD3215           (C:\Users\Paul\Des):00754 [8]                 jsr     WaitForInput            ; go wait for user input
                       (C:\Users\Paul\Des):00755                     
 2CA6 8E370C           (C:\Users\Paul\Des):00756 [3]                 ldx     #blank                  ; get title text memory index
 2CA9 BF36E8           (C:\Users\Paul\Des):00757 [6]                 stx     StringLoc               ; store in string location var
@@ -825,10 +825,10 @@
 2CAF BF36E6           (C:\Users\Paul\Des):00759 [6]                 stx     PrintAtLoc              ; store location to print at
 2CB2 BD3508           (C:\Users\Paul\Des):00760 [8]                 jsr     PrintAtGr               ; Go print text
                       (C:\Users\Paul\Des):00761         
-2CB5 861B             (C:\Users\Paul\Des):00762 [2]                 lda     #JUMP_FRAMES    
-2CB7 9722             (C:\Users\Paul\Des):00763 [4]                 sta     JumpState
-2CB9 962C             (C:\Users\Paul\Des):00764 [4]                 lda     MusicFlag
-2CBB 2608             (C:\Users\Paul\Des):00765 [3]                 bne     ReturnMain
+2CB5 861B             (C:\Users\Paul\Des):00762 [2]                 lda     #JUMP_FRAMES            ; get jump frames count
+2CB7 9722             (C:\Users\Paul\Des):00763 [4]                 sta     JumpState               ; store it in jump state
+2CB9 962C             (C:\Users\Paul\Des):00764 [4]                 lda     MusicFlag               ; get music enabled flag
+2CBB 2608             (C:\Users\Paul\Des):00765 [3]                 bne     ReturnMain              ; currently enabled? no - go return to main
 2CBD B6FF23           (C:\Users\Paul\Des):00766 [5]                 lda     $FF23                   ; re-enable sound
 2CC0 8A08             (C:\Users\Paul\Des):00767 [2]                 ora     #%00001000
 2CC2 B7FF23           (C:\Users\Paul\Des):00768 [5]                 sta     $FF23
@@ -847,17 +847,17 @@
                       (C:\Users\Paul\Des):00781         ;*******************************************************************************
                       (C:\Users\Paul\Des):00782         ;{          NewGround
 2CC6                  (C:\Users\Paul\Des):00783         NewGround    
-2CC6 8E19C0           (C:\Users\Paul\Des):00784 [3]                 ldx     #GRND_POS
+2CC6 8E19C0           (C:\Users\Paul\Des):00784 [3]                 ldx     #GRND_POS               ; set index of ground scan line
                       (C:\Users\Paul\Des):00785         
 2CC9                  (C:\Users\Paul\Des):00786         loopGround
-2CC9 BD36C0           (C:\Users\Paul\Des):00787 [8]                 jsr     GetRandom
-2CCC 8A3C             (C:\Users\Paul\Des):00788 [2]                 ora     #%00111100
-2CCE A78820           (C:\Users\Paul\Des):00789 [4+1]               sta     32,x
-2CD1 43               (C:\Users\Paul\Des):00790 [2]                 coma
-2CD2 A780             (C:\Users\Paul\Des):00791 [4+2]               sta     ,x+
+2CC9 BD36C0           (C:\Users\Paul\Des):00787 [8]                 jsr     GetRandom               ; go get random value
+2CCC 8A3C             (C:\Users\Paul\Des):00788 [2]                 ora     #%00111100              ; create more regular pattern
+2CCE A78820           (C:\Users\Paul\Des):00789 [4+1]               sta     32,x                    ; store it next scan line down
+2CD1 43               (C:\Users\Paul\Des):00790 [2]                 coma                            ; invert it
+2CD2 A780             (C:\Users\Paul\Des):00791 [4+2]               sta     ,x+                     ; store at current scan line, index to next byte column
                       (C:\Users\Paul\Des):00792                     
 2CD4 8C19C5           (C:\Users\Paul\Des):00793 [4]                 cmpx    #GRND_POS+DINO_XOFST    ; put some ground in temp space
-2CD7 2516             (C:\Users\Paul\Des):00794 [3]                 blo     ContGround
+2CD7 2516             (C:\Users\Paul\Des):00794 [3]                 blo     ContGround              
 2CD9 8C19C7           (C:\Users\Paul\Des):00795 [4]                 cmpx    #GRND_POS+DINO_XOFST+2
 2CDC 2211             (C:\Users\Paul\Des):00796 [3]                 bhi     ContGround
 2CDE A789051F         (C:\Users\Paul\Des):00797 [4+4]               sta     SCRL_OFFSET+56,x       
@@ -1099,37 +1099,37 @@
                       (C:\Users\Paul\Des):01033         ;*******************************************************************************
                       (C:\Users\Paul\Des):01034         ;{          doPtero
 2E14                  (C:\Users\Paul\Des):01035         doPtero     
-2E14 962F             (C:\Users\Paul\Des):01036 [4]                 lda     PteroFlag
-2E16 263E             (C:\Users\Paul\Des):01037 [3]                 bne     skipPtero
-2E18 9639             (C:\Users\Paul\Des):01038 [4]                 lda     GameLevel
-2E1A 8104             (C:\Users\Paul\Des):01039 [2]                 cmpa    #04
-2E1C 2504             (C:\Users\Paul\Des):01040 [3]                 blo     SlowLevel
-2E1E 8608             (C:\Users\Paul\Des):01041 [2]                 lda     #08
-2E20 2005             (C:\Users\Paul\Des):01042 [3]                 bra     StoreLow
+2E14 962F             (C:\Users\Paul\Des):01036 [4]                 lda     PteroFlag               ; grab pterodactyl flag
+2E16 263E             (C:\Users\Paul\Des):01037 [3]                 bne     skipPtero               ; already on screen? yes - go skip
+2E18 9639             (C:\Users\Paul\Des):01038 [4]                 lda     GameLevel               ; load game level
+2E1A 8104             (C:\Users\Paul\Des):01039 [2]                 cmpa    #04                     ; at level 4 yet?
+2E1C 2504             (C:\Users\Paul\Des):01040 [3]                 blo     SlowLevel               ; less than? go slow level
+2E1E 8608             (C:\Users\Paul\Des):01041 [2]                 lda     #08                     ; load ptero offset
+2E20 2005             (C:\Users\Paul\Des):01042 [3]                 bra     StoreLow                ; always go low level
 2E22 BD36C0           (C:\Users\Paul\Des):01043 [8]     SlowLevel   jsr     GetRandom               ; determine high or low flying
-2E25 8408             (C:\Users\Paul\Des):01044 [2]                 anda    #%00001000
-2E27 9732             (C:\Users\Paul\Des):01045 [4]     StoreLow    sta     PteroVPos
-2E29 C620             (C:\Users\Paul\Des):01046 [2]                 ldb     #32
-2E2B 3D               (C:\Users\Paul\Des):01047 [11]                mul
-2E2C 8E1700           (C:\Users\Paul\Des):01048 [3]                 ldx     #PTERO_ROW
-2E2F 30890500         (C:\Users\Paul\Des):01049 [4+4]               leax    NEWOB_OFFST,x
-2E33 308B             (C:\Users\Paul\Des):01050 [4+4]               leax    d,x
-2E35 108E4254         (C:\Users\Paul\Des):01051 [4]                 ldy     #pterodactyl1
-2E39 A6A0             (C:\Users\Paul\Des):01052 [4+2]   loopPtero   lda     ,y+
-2E3B 270F             (C:\Users\Paul\Des):01053 [3]                 beq     donePtero
-2E3D A780             (C:\Users\Paul\Des):01054 [4+2]               sta     ,x+
-2E3F A6A0             (C:\Users\Paul\Des):01055 [4+2]               lda     ,y+
-2E41 A780             (C:\Users\Paul\Des):01056 [4+2]               sta     ,x+
-2E43 A6A0             (C:\Users\Paul\Des):01057 [4+2]               lda     ,y+
-2E45 A784             (C:\Users\Paul\Des):01058 [4+0]               sta     ,x
-2E47 30881E           (C:\Users\Paul\Des):01059 [4+1]               leax    30,x
-2E4A 20ED             (C:\Users\Paul\Des):01060 [3]                 bra     loopPtero
+2E25 8408             (C:\Users\Paul\Des):01044 [2]                 anda    #%00001000              ; offset may or may not be 8 scan lines
+2E27 9732             (C:\Users\Paul\Des):01045 [4]     StoreLow    sta     PteroVPos               ; store the position
+2E29 C620             (C:\Users\Paul\Des):01046 [2]                 ldb     #32                     ; 32-bytes per scan line
+2E2B 3D               (C:\Users\Paul\Des):01047 [11]                mul                             ; multiply it
+2E2C 8E1700           (C:\Users\Paul\Des):01048 [3]                 ldx     #PTERO_ROW              ; get index of ptero row
+2E2F 30890500         (C:\Users\Paul\Des):01049 [4+4]               leax    NEWOB_OFFST,x           ; offset it by new obstacle offset
+2E33 308B             (C:\Users\Paul\Des):01050 [4+4]               leax    d,x                     ; offset by ptero row index
+2E35 108E4254         (C:\Users\Paul\Des):01051 [4]                 ldy     #pterodactyl1           ; get index of ptero sprite
+2E39 A6A0             (C:\Users\Paul\Des):01052 [4+2]   loopPtero   lda     ,y+                     ; get bytes
+2E3B 270F             (C:\Users\Paul\Des):01053 [3]                 beq     donePtero               ; at the end of sprite? yes - go to done
+2E3D A780             (C:\Users\Paul\Des):01054 [4+2]               sta     ,x+                     ; store byte on screen, move to next column
+2E3F A6A0             (C:\Users\Paul\Des):01055 [4+2]               lda     ,y+                     ; get another byte, index sprite pointer
+2E41 A780             (C:\Users\Paul\Des):01056 [4+2]               sta     ,x+                     ; store byte on screen, move to next column
+2E43 A6A0             (C:\Users\Paul\Des):01057 [4+2]               lda     ,y+                     ; get another byte, index sprite pointer
+2E45 A784             (C:\Users\Paul\Des):01058 [4+0]               sta     ,x                      ; store byte on screen
+2E47 30881E           (C:\Users\Paul\Des):01059 [4+1]               leax    30,x                    ; index to next scan line (minus bytes for sprite width)
+2E4A 20ED             (C:\Users\Paul\Des):01060 [3]                 bra     loopPtero               ; always loop for more
 2E4C                  (C:\Users\Paul\Des):01061         donePtero   
 2E4C 43               (C:\Users\Paul\Des):01062 [2]                 coma                            ; reset Dino position counter
-2E4D 9731             (C:\Users\Paul\Des):01063 [4]                 sta     PteroHPos
-2E4F 972F             (C:\Users\Paul\Des):01064 [4]                 sta     PteroFlag
-2E51 B60001           (C:\Users\Paul\Des):01065 [5]                 lda     MINDIS_PTER
-2E54 9755             (C:\Users\Paul\Des):01066 [4]                 sta     pterodist 
+2E4D 9731             (C:\Users\Paul\Des):01063 [4]                 sta     PteroHPos               ; store it
+2E4F 972F             (C:\Users\Paul\Des):01064 [4]                 sta     PteroFlag               ; reset ptero on-screen flag
+2E51 B60001           (C:\Users\Paul\Des):01065 [5]                 lda     MINDIS_PTER             ; get minimum distance for next sprite
+2E54 9755             (C:\Users\Paul\Des):01066 [4]                 sta     pterodist               ; store it
 2E56                  (C:\Users\Paul\Des):01067         skipPtero            
 2E56 39               (C:\Users\Paul\Des):01068 [5]                 rts
                       (C:\Users\Paul\Des):01069         ;}
@@ -1145,40 +1145,40 @@
                       (C:\Users\Paul\Des):01079         ;*******************************************************************************
                       (C:\Users\Paul\Des):01080         ;{          dinoBegEnd
 2E57                  (C:\Users\Paul\Des):01081         dinoBegEnd
-2E57 962D             (C:\Users\Paul\Des):01082 [4]                 lda     CollFlag
-2E59 271F             (C:\Users\Paul\Des):01083 [3]                 beq     BeginDino
-2E5B                  (C:\Users\Paul\Des):01084         DeadDino
-2E5B 8E1705           (C:\Users\Paul\Des):01085 [3]                 ldx     #DINO_START+DINO_XOFST
-2E5E CE3BF0           (C:\Users\Paul\Des):01086 [3]                 ldu     #dinodeadi
-2E61 9622             (C:\Users\Paul\Des):01087 [4]                 lda     JumpState
-2E63 271B             (C:\Users\Paul\Des):01088 [3]                 beq     dinoLoop
-2E65 3089FB80         (C:\Users\Paul\Des):01089 [4+4]               leax    JUMP_OFFSET,x
-2E69 CE295E           (C:\Users\Paul\Des):01090 [3]                 ldu     #jumpheight
-2E6C A6C6             (C:\Users\Paul\Des):01091 [4+1]               lda     a,u
-2E6E C620             (C:\Users\Paul\Des):01092 [2]                 ldb     #32
-2E70 3D               (C:\Users\Paul\Des):01093 [11]                mul
-2E71 308B             (C:\Users\Paul\Des):01094 [4+4]               leax    d,x
-2E73 0A22             (C:\Users\Paul\Des):01095 [6]                 dec     JumpState
-2E75 CE3B77           (C:\Users\Paul\Des):01096 [3]                 ldu     #dinodeadji
-2E78 2006             (C:\Users\Paul\Des):01097 [3]                 bra     dinoLoop
+2E57 962D             (C:\Users\Paul\Des):01082 [4]                 lda     CollFlag                ; grab collision flag
+2E59 271F             (C:\Users\Paul\Des):01083 [3]                 beq     BeginDino               ; not set? go do begin Dino
+2E5B                  (C:\Users\Paul\Des):01084         DeadDino                                    ; draw dead Dino
+2E5B 8E1705           (C:\Users\Paul\Des):01085 [3]                 ldx     #DINO_START+DINO_XOFST  ; load index of Dino start
+2E5E CE3BF0           (C:\Users\Paul\Des):01086 [3]                 ldu     #dinodeadi              ; set pointer of dead Dino sprite
+2E61 9622             (C:\Users\Paul\Des):01087 [4]                 lda     JumpState               ; grab current jump state
+2E63 271B             (C:\Users\Paul\Des):01088 [3]                 beq     dinoLoop                ; not in jump frame? go to Dino draw loop
+2E65 3089FB80         (C:\Users\Paul\Des):01089 [4+4]               leax    JUMP_OFFSET,x           ; offset scan line by jump position
+2E69 CE295E           (C:\Users\Paul\Des):01090 [3]                 ldu     #jumpheight             ; get index current jump height
+2E6C A6C6             (C:\Users\Paul\Des):01091 [4+1]               lda     a,u                     ; grab byte from that index
+2E6E C620             (C:\Users\Paul\Des):01092 [2]                 ldb     #32                     ; 32-bytes per scan line
+2E70 3D               (C:\Users\Paul\Des):01093 [11]                mul                             ; multiply it
+2E71 308B             (C:\Users\Paul\Des):01094 [4+4]               leax    d,x                     ; set new scan line offset
+2E73 0A22             (C:\Users\Paul\Des):01095 [6]                 dec     JumpState               ; decrement jump state (collision happened before)
+2E75 CE3B77           (C:\Users\Paul\Des):01096 [3]                 ldu     #dinodeadji             ; grab index of dead Dino jumping sprite
+2E78 2006             (C:\Users\Paul\Des):01097 [3]                 bra     dinoLoop                ; go to Dino draw loop
 2E7A                  (C:\Users\Paul\Des):01098         BeginDino            
-2E7A 8E16A5           (C:\Users\Paul\Des):01099 [3]                 ldx     #DINO_START+DINO_XOFST-$60
-2E7D CE3AFE           (C:\Users\Paul\Des):01100 [3]                 ldu     #dinostandi
+2E7A 8E16A5           (C:\Users\Paul\Des):01099 [3]                 ldx     #DINO_START+DINO_XOFST-$60 ; set index of starting Dino
+2E7D CE3AFE           (C:\Users\Paul\Des):01100 [3]                 ldu     #dinostandi             ; set pointer of start Dino sprite
 2E80                  (C:\Users\Paul\Des):01101         dinoLoop
-2E80 ECC1             (C:\Users\Paul\Des):01102 [5+3]               ldd     ,u++
-2E82 81AA             (C:\Users\Paul\Des):01103 [2]                 cmpa    #$AA
-2E84 271A             (C:\Users\Paul\Des):01104 [3]                 beq     dinoDone
-2E86 AA890CC4         (C:\Users\Paul\Des):01105 [4+4]               ora     OBST_TEMPOF+32,x
-2E8A EA890CC5         (C:\Users\Paul\Des):01106 [4+4]               orb     OBST_TEMPOF+33,x
-2E8E 43               (C:\Users\Paul\Des):01107 [2]                 coma
-2E8F 53               (C:\Users\Paul\Des):01108 [2]                 comb
-2E90 ED84             (C:\Users\Paul\Des):01109 [5+0]               std     ,x      
-2E92 A6C0             (C:\Users\Paul\Des):01110 [4+2]               lda     ,u+
-2E94 AA890CC6         (C:\Users\Paul\Des):01111 [4+4]               ora     OBST_TEMPOF+34,x
-2E98 43               (C:\Users\Paul\Des):01112 [2]                 coma
-2E99 A702             (C:\Users\Paul\Des):01113 [4+1]               sta     2,x
-2E9B 308820           (C:\Users\Paul\Des):01114 [4+1]               leax    32,x
-2E9E 20E0             (C:\Users\Paul\Des):01115 [3]                 bra     dinoLoop
+2E80 ECC1             (C:\Users\Paul\Des):01102 [5+3]               ldd     ,u++                    ; get two bytes, index sprite pointer
+2E82 81AA             (C:\Users\Paul\Des):01103 [2]                 cmpa    #$AA                    ; at end of sprite?
+2E84 271A             (C:\Users\Paul\Des):01104 [3]                 beq     dinoDone                ; yes? go to done
+2E86 AA890CC4         (C:\Users\Paul\Des):01105 [4+4]               ora     OBST_TEMPOF+32,x        ; need to mesh MSB with obstacle sprite
+2E8A EA890CC5         (C:\Users\Paul\Des):01106 [4+4]               orb     OBST_TEMPOF+33,x        ; need to mesh LSB with obstacle sprite
+2E8E 43               (C:\Users\Paul\Des):01107 [2]                 coma                            ; invert MSB
+2E8F 53               (C:\Users\Paul\Des):01108 [2]                 comb                            ; invert LSB
+2E90 ED84             (C:\Users\Paul\Des):01109 [5+0]               std     ,x                      ; put bytes on screen
+2E92 A6C0             (C:\Users\Paul\Des):01110 [4+2]               lda     ,u+                     ; get next column byte, index sprite pointer
+2E94 AA890CC6         (C:\Users\Paul\Des):01111 [4+4]               ora     OBST_TEMPOF+34,x        ; mesh with obstacle byte
+2E98 43               (C:\Users\Paul\Des):01112 [2]                 coma                            ; invert it
+2E99 A702             (C:\Users\Paul\Des):01113 [4+1]               sta     2,x                     ; store it two byte columns over
+2E9B 308820           (C:\Users\Paul\Des):01114 [4+1]               leax    32,x                    ; index scan line
+2E9E 20E0             (C:\Users\Paul\Des):01115 [3]                 bra     dinoLoop                ; always loop Dino draw
 2EA0                  (C:\Users\Paul\Des):01116         dinoDone            
 2EA0 39               (C:\Users\Paul\Des):01117 [5]                 rts
                       (C:\Users\Paul\Des):01118         ;}
@@ -1354,19 +1354,19 @@
 2F9D 9635             (C:\Users\Paul\Des):01288 [4]                 lda     Timer                   ; grab timer value
 2F9F 81E1             (C:\Users\Paul\Des):01289 [2]                 cmpa    #$E1                    ; arbitrary value of time passed
 2FA1 2502             (C:\Users\Paul\Des):01290 [3]                 blo     OverInputs              ; not there yet? go check inputs
-2FA3 2038             (C:\Users\Paul\Des):01291 [3]                 bra     ContDemo                ; 
+2FA3 2038             (C:\Users\Paul\Des):01291 [3]                 bra     ContDemo                ; go continue demo
 2FA5                  (C:\Users\Paul\Des):01292         OverInputs            
-2FA5 9621             (C:\Users\Paul\Des):01293 [4]                 lda     InputFlag
-2FA7 27EE             (C:\Users\Paul\Des):01294 [3]                 beq     OverInput            
+2FA5 9621             (C:\Users\Paul\Des):01293 [4]                 lda     InputFlag               ; grab input flag
+2FA7 27EE             (C:\Users\Paul\Des):01294 [3]                 beq     OverInput               ; user input? no - go check again
                       (C:\Users\Paul\Des):01295                     
-2FA9 BD2FE0           (C:\Users\Paul\Des):01296 [8]                 jsr     InitVars
-2FAC BD2A8E           (C:\Users\Paul\Des):01297 [8]                 jsr     ClearGraphics
-2FAF BD33CB           (C:\Users\Paul\Des):01298 [8]                 jsr     ShowHigh
-2FB2 963A             (C:\Users\Paul\Des):01299 [4]                 lda     FirstGame
-2FB4 2602             (C:\Users\Paul\Des):01300 [3]                 bne     DoneEnd
-2FB6 0C3A             (C:\Users\Paul\Des):01301 [6]                 inc     FirstGame
+2FA9 BD2FE0           (C:\Users\Paul\Des):01296 [8]                 jsr     InitVars                ; go init vars
+2FAC BD2A8E           (C:\Users\Paul\Des):01297 [8]                 jsr     ClearGraphics           ; go clear graphics
+2FAF BD33CB           (C:\Users\Paul\Des):01298 [8]                 jsr     ShowHigh                ; go handle high score
+2FB2 963A             (C:\Users\Paul\Des):01299 [4]                 lda     FirstGame               ; check first game played flag
+2FB4 2602             (C:\Users\Paul\Des):01300 [3]                 bne     DoneEnd                 ; was it? no - done with game over
+2FB6 0C3A             (C:\Users\Paul\Des):01301 [6]                 inc     FirstGame               ; increment first game playe flag
 2FB8                  (C:\Users\Paul\Des):01302         DoneEnd
-2FB8 7E2A4D           (C:\Users\Paul\Des):01303 [4]                 jmp     NewGame
+2FB8 7E2A4D           (C:\Users\Paul\Des):01303 [4]                 jmp     NewGame                 ; go do new game
                       (C:\Users\Paul\Des):01304         ;}
                       (C:\Users\Paul\Des):01305         
                       (C:\Users\Paul\Des):01306         ;*******************************************************************************
@@ -1380,25 +1380,25 @@
                       (C:\Users\Paul\Des):01314         ;{          doDemoOver
 2FBB                  (C:\Users\Paul\Des):01315         doDemoOver
 2FBB 0F35             (C:\Users\Paul\Des):01316 [6]                 clr     Timer                   ; reset timer for timeout
-2FBD 0F3C             (C:\Users\Paul\Des):01317 [6]                 clr     DemoMode
-2FBF 0F2D             (C:\Users\Paul\Des):01318 [6]                 clr     CollFlag
+2FBD 0F3C             (C:\Users\Paul\Des):01317 [6]                 clr     DemoMode                ; reset demo mode flag
+2FBF 0F2D             (C:\Users\Paul\Des):01318 [6]                 clr     CollFlag                ; clear collisions
 2FC1                  (C:\Users\Paul\Des):01319         MoreInput   
-2FC1 BD31F7           (C:\Users\Paul\Des):01320 [8]                 jsr     CheckInput
-2FC4 BD31F0           (C:\Users\Paul\Des):01321 [8]                 jsr     HandleTime
-2FC7 9635             (C:\Users\Paul\Des):01322 [4]                 lda     Timer
-2FC9 8160             (C:\Users\Paul\Des):01323 [2]                 cmpa    #$60
-2FCB 2502             (C:\Users\Paul\Des):01324 [3]                 blo     CheckInputs
-2FCD 200E             (C:\Users\Paul\Des):01325 [3]                 bra     ContDemo
+2FC1 BD31F7           (C:\Users\Paul\Des):01320 [8]                 jsr     CheckInput              ; go check for input
+2FC4 BD31F0           (C:\Users\Paul\Des):01321 [8]                 jsr     HandleTime              ; go handle timer
+2FC7 9635             (C:\Users\Paul\Des):01322 [4]                 lda     Timer                   ; grab timer value
+2FC9 8160             (C:\Users\Paul\Des):01323 [2]                 cmpa    #$60                    ; arbitrary time passes
+2FCB 2502             (C:\Users\Paul\Des):01324 [3]                 blo     CheckInputs             ; still less? yes - go check inputs
+2FCD 200E             (C:\Users\Paul\Des):01325 [3]                 bra     ContDemo                ; always continue demo
 2FCF                  (C:\Users\Paul\Des):01326         CheckInputs            
-2FCF 9621             (C:\Users\Paul\Des):01327 [4]                 lda     InputFlag
-2FD1 27EE             (C:\Users\Paul\Des):01328 [3]                 beq     MoreInput
+2FCF 9621             (C:\Users\Paul\Des):01327 [4]                 lda     InputFlag               ; grab input flag
+2FD1 27EE             (C:\Users\Paul\Des):01328 [3]                 beq     MoreInput               ; no input? go get check again
                       (C:\Users\Paul\Des):01329                     
-2FD3 0F21             (C:\Users\Paul\Des):01330 [6]                 clr     InputFlag
-2FD5 0F3C             (C:\Users\Paul\Des):01331 [6]                 clr     DemoMode
-2FD7 BD2FE0           (C:\Users\Paul\Des):01332 [8]                 jsr     InitVars
-2FDA 7E2A4D           (C:\Users\Paul\Des):01333 [4]                 jmp     NewGame
+2FD3 0F21             (C:\Users\Paul\Des):01330 [6]                 clr     InputFlag               ; clear input flag
+2FD5 0F3C             (C:\Users\Paul\Des):01331 [6]                 clr     DemoMode                ; clear demo mode flag
+2FD7 BD2FE0           (C:\Users\Paul\Des):01332 [8]                 jsr     InitVars                ; go init vars
+2FDA 7E2A4D           (C:\Users\Paul\Des):01333 [4]                 jmp     NewGame                 ; go do new game
 2FDD                  (C:\Users\Paul\Des):01334         ContDemo
-2FDD 7E341D           (C:\Users\Paul\Des):01335 [4]                 jmp     HandleTitle
+2FDD 7E341D           (C:\Users\Paul\Des):01335 [4]                 jmp     HandleTitle             ; go handle title screen
                       (C:\Users\Paul\Des):01336         
                       (C:\Users\Paul\Des):01337         ;}
                       (C:\Users\Paul\Des):01338         
@@ -1413,33 +1413,33 @@
                       (C:\Users\Paul\Des):01347         ;*******************************************************************************
                       (C:\Users\Paul\Des):01348         ;{          InitVars
 2FE0                  (C:\Users\Paul\Des):01349         InitVars
-2FE0 8E59D8           (C:\Users\Paul\Des):01350 [3]                 ldx     #dinotune1
-2FE3 9FB2             (C:\Users\Paul\Des):01351 [5]                 stx     <curnote+1
+2FE0 8E59D8           (C:\Users\Paul\Des):01350 [3]                 ldx     #dinotune1              ; set index to first tune
+2FE3 9FB2             (C:\Users\Paul\Des):01351 [5]                 stx     <curnote+1              ; store notes in pointer (self modifying)
                       (C:\Users\Paul\Des):01352                     
-2FE5 8E4320           (C:\Users\Paul\Des):01353 [3]                 ldx     #pic+32
-2FE8 BF2AD3           (C:\Users\Paul\Des):01354 [6]                 stx     >ddd+1
+2FE5 8E4320           (C:\Users\Paul\Des):01353 [3]                 ldx     #pic+32                 ; load bitmap index
+2FE8 BF2AD3           (C:\Users\Paul\Des):01354 [6]                 stx     >ddd+1                  ; store in pointer
                       (C:\Users\Paul\Des):01355                     
-2FEB 8E4300           (C:\Users\Paul\Des):01356 [3]                 ldx     #pic
-2FEE BF2B45           (C:\Users\Paul\Des):01357 [6]                 stx     >picptr+1
+2FEB 8E4300           (C:\Users\Paul\Des):01356 [3]                 ldx     #pic                    ; set index to mountain start
+2FEE BF2B45           (C:\Users\Paul\Des):01357 [6]                 stx     >picptr+1               ; store in pointer
                       (C:\Users\Paul\Des):01358                     
-2FF1 0F2D             (C:\Users\Paul\Des):01359 [6]                 clr     CollFlag
-2FF3 0F2F             (C:\Users\Paul\Des):01360 [6]                 clr     PteroFlag
-2FF5 0F23             (C:\Users\Paul\Des):01361 [6]                 clr     DuckState
-2FF7 0F22             (C:\Users\Paul\Des):01362 [6]                 clr     JumpState
-2FF9 0F39             (C:\Users\Paul\Des):01363 [6]                 clr     GameLevel
-2FFB 0F3B             (C:\Users\Paul\Des):01364 [6]                 clr     PauseState
-2FFD 0F33             (C:\Users\Paul\Des):01365 [6]                 clr     TotDist
-2FFF 0F34             (C:\Users\Paul\Des):01366 [6]                 clr     TotDist+1
-3001 0F3F             (C:\Users\Paul\Des):01367 [6]                 clr     DinoIsGod
-3003 0F43             (C:\Users\Paul\Des):01368 [6]                 clr     curobst1
-3005 0F44             (C:\Users\Paul\Des):01369 [6]                 clr     curobst2
-3007 0F45             (C:\Users\Paul\Des):01370 [6]                 clr     curobst3
-3009 0F46             (C:\Users\Paul\Des):01371 [6]                 clr     curobst4
+2FF1 0F2D             (C:\Users\Paul\Des):01359 [6]                 clr     CollFlag                ; clear collisions
+2FF3 0F2F             (C:\Users\Paul\Des):01360 [6]                 clr     PteroFlag               ; clear Pterodactyl flag
+2FF5 0F23             (C:\Users\Paul\Des):01361 [6]                 clr     DuckState               ; clear ducking state
+2FF7 0F22             (C:\Users\Paul\Des):01362 [6]                 clr     JumpState               ; clear jump state
+2FF9 0F39             (C:\Users\Paul\Des):01363 [6]                 clr     GameLevel               ; reset game level
+2FFB 0F3B             (C:\Users\Paul\Des):01364 [6]                 clr     PauseState              ; reset pause state
+2FFD 0F33             (C:\Users\Paul\Des):01365 [6]                 clr     TotDist                 ; reset MSB distance (score)
+2FFF 0F34             (C:\Users\Paul\Des):01366 [6]                 clr     TotDist+1               ; reset LSB distance (score)
+3001 0F3F             (C:\Users\Paul\Des):01367 [6]                 clr     DinoIsGod               ; reset Easter Egg
+3003 0F43             (C:\Users\Paul\Des):01368 [6]                 clr     curobst1                ; clear obstacle01 pointer (demo mode)
+3005 0F44             (C:\Users\Paul\Des):01369 [6]                 clr     curobst2                ; clear obstacle01 pointer (demo mode)
+3007 0F45             (C:\Users\Paul\Des):01370 [6]                 clr     curobst3                ; clear obstacle01 pointer (demo mode)
+3009 0F46             (C:\Users\Paul\Des):01371 [6]                 clr     curobst4                ; clear obstacle01 pointer (demo mode)
                       (C:\Users\Paul\Des):01372                     
 300B 861E             (C:\Users\Paul\Des):01373 [2]                 lda     #30                     ; newobheight
 300D C60C             (C:\Users\Paul\Des):01374 [2]                 ldb     #12                     ; newmntspeed
-300F DD58             (C:\Users\Paul\Des):01375 [5]                 std     newobheight
-3011 0F51             (C:\Users\Paul\Des):01376 [6]                 clr     obstaclechk
+300F DD58             (C:\Users\Paul\Des):01375 [5]                 std     newobheight             ; store them as defaults
+3011 0F51             (C:\Users\Paul\Des):01376 [6]                 clr     obstaclechk             ; cleare obstacle check flag
 3013 39               (C:\Users\Paul\Des):01377 [5]                 rts
                       (C:\Users\Paul\Des):01378         ;}            
                       (C:\Users\Paul\Des):01379         
@@ -1455,14 +1455,14 @@
                       (C:\Users\Paul\Des):01389         ;{          ChckButton
 3014                  (C:\Users\Paul\Des):01390         ChckButton  
 3014 963B             (C:\Users\Paul\Des):01391 [4]                 lda     PauseState              ; game currently paused? 
-3016 2649             (C:\Users\Paul\Des):01392 [3]                 bne     ChckPause
+3016 2649             (C:\Users\Paul\Des):01392 [3]                 bne     ChckPause           
 3018 962E             (C:\Users\Paul\Des):01393 [4]                 lda     KeyFlag                 ; still processing keystroke?
 301A 2675             (C:\Users\Paul\Des):01394 [3]                 bne     ButtDone
 301C 9622             (C:\Users\Paul\Des):01395 [4]                 lda     JumpState               ; already in jump cycle?
 301E 2671             (C:\Users\Paul\Des):01396 [3]                 bne     ButtDone
                       (C:\Users\Paul\Des):01397                     
 3020 86FF             (C:\Users\Paul\Des):01398 [2]                 lda     #$FF                    ; mask keystrokes
-3022 B7FF02           (C:\Users\Paul\Des):01399 [5]                 sta     $FF02
+3022 B7FF02           (C:\Users\Paul\Des):01399 [5]                 sta     $FF02                   ; set bits high
 3025 B6FF00           (C:\Users\Paul\Des):01400 [5]                 lda     $FF00                   ; load PIA0 state
 3028 8402             (C:\Users\Paul\Des):01401 [2]                 anda    #%00000010              ; check left-joystick button-1
 302A 2707             (C:\Users\Paul\Des):01402 [3]                 beq     SetJump
@@ -1471,7 +1471,7 @@
 3031 2607             (C:\Users\Paul\Des):01405 [3]                 bne     NextButt
 3033                  (C:\Users\Paul\Des):01406         SetJump            
 3033 861B             (C:\Users\Paul\Des):01407 [2]                 lda     #JUMP_FRAMES            ; 15-frames in jump animation
-3035 9722             (C:\Users\Paul\Des):01408 [4]                 sta     JumpState
+3035 9722             (C:\Users\Paul\Des):01408 [4]                 sta     JumpState               ; store it
 3037 2022             (C:\Users\Paul\Des):01409 [3]                 bra     ClearDuck               ; go clear ducking status
 3039                  (C:\Users\Paul\Des):01410         JmpButtDone            
 3039 39               (C:\Users\Paul\Des):01411 [5]                 rts
@@ -1597,11 +1597,11 @@
                       (C:\Users\Paul\Des):01531         ;*******************************************************************************
                       (C:\Users\Paul\Des):01532         ;{          otherPause
 30E7                  (C:\Users\Paul\Des):01533         otherPause
-30E7 B6FF23           (C:\Users\Paul\Des):01534 [5]                 lda     $FF23
+30E7 B6FF23           (C:\Users\Paul\Des):01534 [5]                 lda     $FF23                   ; turn off audio
 30EA 84F7             (C:\Users\Paul\Des):01535 [2]                 anda    #%11110111
 30EC B7FF23           (C:\Users\Paul\Des):01536 [5]                 sta     $FF23
                       (C:\Users\Paul\Des):01537                     
-30EF 0C3B             (C:\Users\Paul\Des):01538 [6]                 inc     PauseState
+30EF 0C3B             (C:\Users\Paul\Des):01538 [6]                 inc     PauseState              ; set pause state flag
                       (C:\Users\Paul\Des):01539                     
 30F1 7336E0           (C:\Users\Paul\Des):01540 [7]                 com     CipherTXT               ; set cipher mode
                       (C:\Users\Paul\Des):01541                     
@@ -1619,8 +1619,8 @@
                       (C:\Users\Paul\Des):01553                     
 3112 7336E0           (C:\Users\Paul\Des):01554 [7]                 com     CipherTXT               ; reset cipher mode
                       (C:\Users\Paul\Des):01555                     
-3115 BD3215           (C:\Users\Paul\Des):01556 [8]                 jsr     WaitForInput
-3118 0F3B             (C:\Users\Paul\Des):01557 [6]                 clr     PauseState
+3115 BD3215           (C:\Users\Paul\Des):01556 [8]                 jsr     WaitForInput            ; go check for input
+3118 0F3B             (C:\Users\Paul\Des):01557 [6]                 clr     PauseState              ; clear pause state
                       (C:\Users\Paul\Des):01558                     
 311A 8E370C           (C:\Users\Paul\Des):01559 [3]                 ldx     #blank                  ; get title text memory index
 311D BF36E8           (C:\Users\Paul\Des):01560 [6]                 stx     StringLoc               ; store in string location var
@@ -1632,10 +1632,10 @@
 312C BF36E6           (C:\Users\Paul\Des):01566 [6]                 stx     PrintAtLoc              ; store location to print at
 312F BD3508           (C:\Users\Paul\Des):01567 [8]                 jsr     PrintAtGr               ; Go print text
                       (C:\Users\Paul\Des):01568                     
-3132 962C             (C:\Users\Paul\Des):01569 [4]                 lda     MusicFlag
-3134 2608             (C:\Users\Paul\Des):01570 [3]                 bne     DoneOtherP
+3132 962C             (C:\Users\Paul\Des):01569 [4]                 lda     MusicFlag               ; was music playing?
+3134 2608             (C:\Users\Paul\Des):01570 [3]                 bne     DoneOtherP              ; no? go to done
                       (C:\Users\Paul\Des):01571                     
-3136 B6FF23           (C:\Users\Paul\Des):01572 [5]                 lda     $FF23
+3136 B6FF23           (C:\Users\Paul\Des):01572 [5]                 lda     $FF23                   ; re-enable audio
 3139 8A08             (C:\Users\Paul\Des):01573 [2]                 ora     #%00001000
 313B B7FF23           (C:\Users\Paul\Des):01574 [5]                 sta     $FF23
 313E                  (C:\Users\Paul\Des):01575         DoneOtherP            
