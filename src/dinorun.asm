@@ -5,8 +5,8 @@
 ;*            written by                                                       *
 ;*            Paul Fiscarelli and Simon Jonassen                               *
 ;*                                                                             *
-;*            v1.1.0                                                           *
-;*            August 24, 2019                                                  *
+;*            v1.1.1                                                           *
+;*            November 14, 2019                                                *
 ;*                                                                             *
 ;*******************************************************************************
 
@@ -401,16 +401,16 @@ Done        bra     Main                    ; always loop Main
 ClearGraphics            
             ldd     #$FFFF
             ldx     #VID_START              ; beginning of video space
-GraphicCLR  std     ,x++
+GraphicCLR  std     ,x++                    ; store 2-bytes
             cmpx    #VID_END                ; clear $2800-$2C80 for temp space
             blo     GraphicCLR              ; are we there yet? no - go for more
             
             ldd     #$0000                  ; clear temp space
             ldx     #VID_START+$1B00        ; offset from video space
 GraphicCLR2 
-            std     ,x++
-            cmpx    #VID_START+$24FF
-            blo     GraphicCLR2            
+            std     ,x++                    ; store 2-bytes
+            cmpx    #VID_START+$24FF        ; clear through $28FF for temp space
+            blo     GraphicCLR2             ; are we done? no - go do more
 
             rts
 ;}
@@ -426,24 +426,24 @@ GraphicCLR2
 ;*******************************************************************************
 ;{          GetTune
 GetTune
-            dec     tuneselect
-            beq     playTune1
-            lda     tuneselect
-            cmpa    #02
-            beq     playTune2
-playTune3   ldx     #dinotune3
-            stx     <curnote+1
-            ldd     ,x++                    ;get beginning 2 notes from pattern - cont            
+            dec     tuneselect              ; decrement tune counter        
+            beq     playTune1               ; at zero? yes - go play first tune
+            lda     tuneselect              ; load tune number
+            cmpa    #02                     ; set to tune-2?
+            beq     playTune2               ; yes? go play tune-2
+playTune3   ldx     #dinotune3              ; default to tune-3
+            stx     <curnote+1              ; store notes in our pointer (self-modifying)
+            ldd     ,x++                    ; get beginning 2 notes from pattern - cont            
             rts
-playTune2   ldx     #dinotune2
-            stx     <curnote+1
-            ldd     ,x++                    ;get beginning 2 notes from pattern - cont
+playTune2   ldx     #dinotune2              ; set index to tune-2
+            stx     <curnote+1              ; store notes in our pointer (self-mofifying)
+            ldd     ,x++                    ; get beginning 2 notes from pattern - cont
             rts
-playTune1   lda     #3
-            sta     tuneselect
-            ldx     #dinotune1
-            stx     <curnote+1
-            ldd     ,x++                    ;get beginning 2 notes from pattern - cont
+playTune1   lda     #03                     ; reset tune counter
+            sta     tuneselect              ; store it
+            ldx     #dinotune1              ; set index to tune-1
+            stx     <curnote+1              ; store notes in our pointer (self-modifying)
+            ldd     ,x++                    ; get beginning 2 notes from pattern - cont
             rts
 ;}            
 
@@ -2392,21 +2392,21 @@ DoneANDLet
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ScrollObst
-ScrollObst  dec     cyclescroll
-            bne     DonePrint               ; go to nearest rts - save lbne
-            lda     #SCRL_CYCLE
-            sta     cyclescroll
+ScrollObst  dec     cyclescroll             ; cycle our scroll counter
+            bne     DonePrint               ; time to reset? no - go to nearest rts to save lbne
+            lda     #SCRL_CYCLE             ; reset scroll counter
+            sta     cyclescroll             ; store it
 ObstLoop    
-            ldx     #OBST_ROW
-            leax    767,x
-            dec     obstaclespd
-            lbeq    ObstDone
+            ldx     #OBST_ROW               ; grab height of obstaacles
+            leax    767,x                   ; adjust for offset
+            dec     obstaclespd             ; cycle obstacle speed
+            lbeq    ObstDone                ; done? yes - go do done routine
 DoObstBand  
-            orcc    #$01
-            rol     TROL_OFFSET+3,x
-            rol     TROL_OFFSET+2,x
-            rol     TROL_OFFSET+1,x
-            rol     ,x
+            orcc    #$01                    ; clear CC to not ROL garbage bits
+            rol     TROL_OFFSET+3,x         ; ROL temp byte-3
+            rol     TROL_OFFSET+2,x         ; ROL temp byte-2
+            rol     TROL_OFFSET+1,x         ; ROL temp byte-1
+            rol     ,x                      ; ROL on-screen scan line
             rol     -1,x
             rol     -2,x
             rol     -3,x
@@ -2430,16 +2430,16 @@ DoObstBand
             rol     -21,x
             rol     -22,x
             rol     -23,x
-            rol     SCRL_OFFSET,x
+            rol     SCRL_OFFSET,x           ; skip Dino bounding box - ROL temp space instead
             rol     SCRL_OFFSET-1,x
             rol     SCRL_OFFSET-2,x
-            rol     -27,x
+            rol     -27,x                   ; contine ROL on-screen scan line
             rol     -28,x
             rol     -29,x
             rol     -30,x
             rol     -31,x
             
-            lda     SCRL_OFFSET,x
+            lda     SCRL_OFFSET,x           ; merge obstacle temp space with Dino bounding box
             coma
             sta     OBST_TEMPOF+8,x
             ora     -24+DINO_TEMPOF,x
@@ -2466,25 +2466,25 @@ DoObstBand
             jmp     DoObstBand
 
 BandDone                
-            jsr     CheckObst
-            lda     newobheight
-            sta     obstclrows
-            jmp     ObstLoop
+            jsr     CheckObst               ; go check moving obstacles
+            lda     newobheight             ; grab obstacle height
+            sta     obstclrows              ; store as rows for ROL'ing
+            jmp     ObstLoop                ; go do more looping
 ObstDone    
-            lda     #OBST_SPEED
-            sta     obstaclespd
+            lda     #OBST_SPEED             ; grab obstacle speed counter
+            sta     obstaclespd             ; store it
             rts	
             
-            ldx     #PTERO_ROW
-            leax    1023,x
+            ldx     #PTERO_ROW              ; grab where Pterodactyls start
+            leax    1023,x                  ; offset it (32 scan lines minus 1-byte column)
 CopyObst    
-            dec     obstclrows
-            beq     CopyDone
-            leax    -32,x
-            bra     CopyObst
+            dec     obstclrows              ; decrement obstacle rows
+            beq     CopyDone                ; done? yes - finish obstacle band
+            leax    -32,x                   ; decrement by a single scan line
+            bra     CopyObst                ; always loop obstacle copy
 CopyDone    
-            lda     #OBST_HEIGHT
-            sta     obstclrows
+            lda     #OBST_HEIGHT            ; grab obstacle height var
+            sta     obstclrows              ; store it
 ScrollDone  
             rts
 ;}
@@ -2580,9 +2580,9 @@ DoneObChck
 ;*******************************************************************************
 ;{          GetEntropy
 GetEntropy
-            lda     Timer+1
-            sta     $0113
-            jsr     InitRandom
+            lda     Timer+1                 ; increment timer value
+            sta     $0113                   ; store it
+            jsr     InitRandom              ; go handle randomness
             rts
 ;}            
             
@@ -2595,10 +2595,10 @@ GetEntropy
 ;*                                                                             *
 ;*******************************************************************************
 ;{          InitRandom
-InitRandom  lda     $113                    ;grab RNG seed (BASIC TIMER)
-            bne     store_rng
-            inca
-store_rng   sta     rndx+1
+InitRandom  lda     $113                    ; grab RND seed (BASIC timer)
+            bne     store_rng               ; check it
+            inca                            ; increment value
+store_rng   sta     rndx+1                  ; store it in our pointer
             rts
 ;}
 
@@ -2700,6 +2700,6 @@ dinotune2
 dinotune3            
             include	    ".\include\dinorun\dinotun3.asm"            
             
-version     fcn     'v1.1 08-24-19'
+version     fcn     'v1.1.1 11-14-19'
             
             end     Start
