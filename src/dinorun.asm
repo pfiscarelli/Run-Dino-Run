@@ -2304,7 +2304,7 @@ PrintAtGr
 PrintLoop            
             lda     ,y+                     ; grab first byte of string
             beq     DonePrint               ; done with string, go to DonePrint
-            inc     lettercount
+;            inc     lettercount            ; is this still needed?
 DoChar                  
             anda    #%00111111              ; subtract 64 from ASCII value
             ldb     CipherTXT               ; check for cipher
@@ -2328,7 +2328,7 @@ DonePrint
             rts
 
 ;}
-lettercount zmb     1
+;lettercount zmb     1                      ; is this still needed?
 
 
 
@@ -2341,7 +2341,7 @@ lettercount zmb     1
 ;*                                                                             *
 ;*******************************************************************************
 ;{          pfWord
-pfWord
+pfWord                                      ; hack for center text (plots as graphic object)
             ldx     PrintAtLoc
             ldu     #pfcredits
 bigPF       ldb     #16
@@ -2366,7 +2366,7 @@ DoneLetters
 ;*                                                                             *
 ;*******************************************************************************
 ;{          andWord
-andWord
+andWord                                     ; hack for center text (plots as graphic object)
             ldx     PrintAtLoc
             ;ldu     StringLoc
             ldu     #andcredits
@@ -2396,12 +2396,12 @@ ScrollObst  dec     cyclescroll             ; cycle our scroll counter
             bne     DonePrint               ; time to reset? no - go to nearest rts to save lbne
             lda     #SCRL_CYCLE             ; reset scroll counter
             sta     cyclescroll             ; store it
-ObstLoop    
-            ldx     #OBST_ROW               ; grab height of obstaacles
+ObstLoop                                    ; loop to handle entire band of obstacles (32 bytes/scan-line * obstacle-height)
+            ldx     #OBST_ROW               ; grab height of obstacles
             leax    767,x                   ; adjust for offset
             dec     obstaclespd             ; cycle obstacle speed
             lbeq    ObstDone                ; done? yes - go do done routine
-DoObstBand  
+DoObstBand                                  ; routine to ROL full scan line
             orcc    #$01                    ; clear CC to not ROL garbage bits
             rol     TROL_OFFSET+3,x         ; ROL temp byte-3
             rol     TROL_OFFSET+2,x         ; ROL temp byte-2
@@ -2433,7 +2433,7 @@ DoObstBand
             rol     SCRL_OFFSET,x           ; skip Dino bounding box - ROL temp space instead
             rol     SCRL_OFFSET-1,x
             rol     SCRL_OFFSET-2,x
-            rol     -27,x                   ; contine ROL on-screen scan line
+            rol     -27,x                   ; contine ROL of on-screen scan line
             rol     -28,x
             rol     -29,x
             rol     -30,x
@@ -2460,10 +2460,10 @@ DoObstBand
             coma
             sta     -26,x            
 
-            dec     obstclrows
-            beq     BandDone
-            leax    -32,x           
-            jmp     DoObstBand
+            dec     obstclrows              ; decrement row counter
+            beq     BandDone                ; are we done? yes - go to done
+            leax    -32,x                   ; shift index by full scan line
+            jmp     DoObstBand              ; go do obstacle band loop
 
 BandDone                
             jsr     CheckObst               ; go check moving obstacles
@@ -2614,19 +2614,19 @@ store_rng   sta     rndx+1                  ; store it in our pointer
 ;*******************************************************************************
 ;{          GetRandom
 GetRandom
-rndx		lda     #01
-            inca
-            sta     rndx+1
-rnda		eora    #00
-rndc		eora    #00
-            sta     rnda+1
-rndb        adda    #00
-            sta     rndb+1
-            lsra
-            adda    rndc+1
-            eora    rnda+1
-            sta     rndc+1
-            sta     rndx+1
+rndx		lda     #01                     ; memory pointer for RND value
+            inca                            ; increment it
+            sta     rndx+1                  ; store it back
+rnda		eora    #00                     ; flip some bits in first temp pointer
+rndc		eora    #00                     ; flip some bits in third temp pointer
+            sta     rnda+1                  ; store back to first temp pointer
+rndb        adda    #00                     ; add new value to contents of second temp pointer
+            sta     rndb+1                  ; store it back to second temp pointer
+            lsra                            ; shift bit left
+            adda    rndc+1                  ; add with contents of third temp pointer
+            eora    rnda+1                  ; flip bits with contents of first temp pointer
+            sta     rndc+1                  ; store value into third temp pointer
+            sta     rndx+1                  ; store new value back to our pointer
             rts
 ;}  
 
