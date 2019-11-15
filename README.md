@@ -7,7 +7,7 @@
         	    <img src="./images/dino_run_title.png" border="3" style="width:50%">
       	    </td>
             <td style="padding:5px" align="center">
-            	<img src="./images/dino_run_play.png" border="3" style="width:50%">
+            	<img src="./images/dino_run_play.gif" border="3" style="width:50%">
              </td>
         </tr>
     </table>
