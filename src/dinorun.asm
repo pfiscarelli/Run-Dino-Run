@@ -1931,90 +1931,91 @@ doneScore
 HandleLevel
             ldx     TotDist                 ; get total distance (score)
 
-            lda     GameLevel
-            cmpa    #07
-            beq     doneScore
-            cmpa    #06
-            beq     Check7
-            cmpa    #05
-            beq     Check6
-            cmpa    #04
-            beq     Check5
-            cmpa    #03
-            beq     Check4
-            cmpa    #02
-            beq     Check3
-            cmpa    #01
-            beq     Check2
+            lda     GameLevel               ; get current game level
+            cmpa    #07                     ; already at max?
+            beq     doneScore               ; yes? go to done
+            cmpa    #06                     ; at level-6?
+            beq     Check7                  ; yes? go check for level 7
+            cmpa    #05                     ; at level-5?
+            beq     Check6                  ; yes? go check for level 6
+            cmpa    #04                     ; at level-4?
+            beq     Check5                  ; yes? go check for level 5
+            cmpa    #03                     ; at level-3?
+            beq     Check4                  ; yes? go check for level 4
+            cmpa    #02                     ; at level-2?
+            beq     Check3                  ; yes? go check for level 3
+            cmpa    #01                     ; at level-1?
+            beq     Check2                  ; yes? go check for level 2
+                                            ; level-0 default check
 Check1                                      ; check level-1 done
-            cmpx    #LEVEL_1
-            blo     DoneLevel
-            inc     GameLevel
+            cmpx    #LEVEL_1                ; level-2 yet?
+            blo     DoneLevel               ; still less? go to done
+            inc     GameLevel               ; increment to next level
 Handle1
             lda     #30                     ; newobheight
             ldb     #11                     ; newmntspeed
-            std     newobheight
+            std     newobheight             ; update both values    
 Check2                                      ; check level-2 done
-            cmpx    #LEVEL_2
-            blo     DoneLevel
-            inc     GameLevel
+            cmpx    #LEVEL_2                ; level-3 yet?
+            blo     DoneLevel               ; still less? go to done
+            inc     GameLevel               ; increment to next level
 Handle2
             lda     #28                     ; newobheight
             ldb     #10                     ; newmntspeed
-            std     newobheight
-            lda     #4
-            sta     obstaclechk
+            std     newobheight             ; update both values
+            lda     #4                      ; new obstacle level
+            sta     obstaclechk             ; update it
             rts
 Check3                                      ; check level-3 done
-            cmpx    #LEVEL_3
-            blo     DoneLevel
-            inc     GameLevel
+            cmpx    #LEVEL_3                ; level-4 yet?
+            blo     DoneLevel               ; still less? go to done
+            inc     GameLevel               ; increment to next level
 Handle3
             lda     #26                     ; newobheight
             ldb     #9                      ; newmntspeed
-            std     newobheight
-            lda     #8
-            sta     obstaclechk
+            std     newobheight             ; update both values
+            lda     #8                      ; new obstacle level
+            sta     obstaclechk             ; update it
             rts
 Check4                                      ; check level-4 done
-            cmpx    #LEVEL_4
-            blo     DoneLevel
-            inc     GameLevel
+            cmpx    #LEVEL_4                ; level-5 yet?
+            blo     DoneLevel               ; still less? go to done
+            inc     GameLevel               ; increment to next level
 Handle4 
             lda     #24                     ; newobheight
             ldb     #8                      ; newmntspeed
-            std     newobheight
+            std     newobheight             ; update both values
             rts
 Check5                                      ; check level-5 done
-            cmpx    #LEVEL_5
-            blo     DoneLevel
-            inc     GameLevel
+            cmpx    #LEVEL_5                ; level-6 yet?
+            blo     DoneLevel               ; still less? go to done
+            inc     GameLevel               ; increment to next level
 Handle5
             lda     #24                     ; newobheight
             ldb     #7                      ; newmntspeed
-            std     newobheight
-            lda     #4
-            sta     obstaclechk
+            std     newobheight             ; update both values
+            lda     #4                      ; new obstacle level
+            sta     obstaclechk             ; update it
             rts
 Check6                                      ; check level-6 done
-            cmpx    #LEVEL_6
-            blo     DoneLevel
-            inc     GameLevel
+            cmpx    #LEVEL_6                ; level-7 yet?    
+            blo     DoneLevel               ; still less? go to done
+            inc     GameLevel               ; increment to next level
 Handle6
             lda     #20                     ; newobheight
             ldb     #6                      ; newmntspeed
-            std     newobheight
+            std     newobheight             ; update both values
             rts             
 Check7                                      ; check level-7 done
-            cmpx    #LEVEL_7
-            blo     DoneLevel
-            inc     GameLevel
+            cmpx    #LEVEL_7                ; max level yet?
+            blo     DoneLevel               ; still less? go to done
+            inc     GameLevel               ; increment to next level
 Handle7
             lda     #16                     ; newobheight
             ldb     #4                      ; newmntspeed
-            std     newobheight
-            lda     #12
-            sta     obstaclechk
+            std     newobheight             ; update both values
+            lda     #12                     ; new obstacle level
+            sta     obstaclechk             ; update it
 DoneLevel
             rts           
 ;}
@@ -2086,25 +2087,25 @@ ShowHigh
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
    
-            lda     #03
-            ldb     HScrTenTh
-            jsr     HScoreChange
+            lda     #03                     ; handle ten-thousandths digit
+            ldb     HScrTenTh               ; get digit value
+            jsr     HScoreChange            ; go handle digit update
             
-            lda     #04
-            ldb     HScrThou
-            jsr     HScoreChange
+            lda     #04                     ; handle thousandths digit
+            ldb     HScrThou                ; get digit value
+            jsr     HScoreChange            ; go handle digit update
             
-            lda     #05
-            ldb     HScrHund
-            jsr     HScoreChange
+            lda     #05                     ; handle hundreths digit
+            ldb     HScrHund                ; get digit value
+            jsr     HScoreChange            ; go handle digit update
             
-            lda     #06
-            ldb     HScrTen
-            jsr     HScoreChange
+            lda     #06                     ; handle tens digit
+            ldb     HScrTen                 ; get digit value
+            jsr     HScoreChange            ; go handle digit update
             
-            lda     #07
-            ldb     HScrUnit
-            jsr     HScoreChange
+            lda     #07                     ; handle units digit
+            ldb     HScrUnit                ; get digit value
+            jsr     HScoreChange            ; go handle digit update
 doneHigh             
             rts
             
@@ -2125,13 +2126,13 @@ HScoreCont
             mul                             ; font x8-bytes
             ldx     #numbers                ; get numbers font location
             leax    d,x                     ; store offset location
-            lda     #8
+            lda     #8                      ; reset 8-bytes per char
 HMoreFont    
-            ldb     ,x+
-            stb     ,u
-            leau    32,u
-            deca
-            bne     HMoreFont
+            ldb     ,x+                     ; get font byte, index font pointer
+            stb     ,u                      ; store on screen
+            leau    32,u                    ; cycle index - next scan line
+            deca                            ; decrement char counter
+            bne     HMoreFont               ; done with char? no - go do more
             rts
 ;}
 
@@ -2249,24 +2250,24 @@ DoneTitle
 ;*******************************************************************************
 ;{          TitleGraphic
 TitleGraphic
-            bsr     wvs
-            ldx     #dinopic
-            ldu     #VID_START+$0100
-TitleLoop   ldd     ,x++
-            ora     xx
-            orb     xx
+            bsr     wvs                     ; go check for v-sync
+            ldx     #dinopic                ; load index of Dino title graphic
+            ldu     #VID_START+$0100        ; set index of location on title page
+TitleLoop   ldd     ,x++                    ; get two bytes, increment graphic pointer
+            ora     xx                      ; graphic effect MSB
+            orb     xx                      ; graphic effect LSB
 
-            std     ,u++
-            cmpx    #enddinopic
-            blo     TitleLoop
-            asl     xx
-            bcs     TitleGraphic
-            com     xx
-            ldb     #4
-            stb     wvs+1
+            std     ,u++                    ; put two bytes on title page, increment index
+            cmpx    #enddinopic             ; at the end of title graphic?
+            blo     TitleLoop               ; still less? go do title loop
+            asl     xx                      ; shift our gfx effect byte
+            bcs     TitleGraphic            ; carry set (still cycle gfx effect)? yes - go do more
+            com     xx                      ; reset gfx effect byte
+            ldb     #4                      ; set v-sync counter
+            stb     wvs+1                   ; store it
             rts
 
-xx          fcb     %11111111
+xx          fcb     %11111111               ; byte for gfx effect
 ;}
 
 
@@ -2280,12 +2281,12 @@ xx          fcb     %11111111
 ;*******************************************************************************
 ;{          wvs
 wvs         
-            ldb     #4
-vs          lda     $ff03
-            bpl     vs
-            lda     $ff02
-            decb
-            bne     vs
+            ldb     #4                      ; set v-sync counter
+vs          lda     $ff03                   ; check v-sync status
+            bpl     vs                      ; there yet? no - go wait some more
+            lda     $ff02                   ; hit our v-sync
+            decb                            ; decrement counter
+            bne     vs                      ; at zero yet? no - go do another
             rts
 ;}
 
