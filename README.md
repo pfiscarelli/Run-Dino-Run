@@ -4,10 +4,10 @@
     <table>
 	    <tr>
     	    <td style="padding:5px" align="center">
-        	    <img src="./images/dino_run_title.png" border="3" width="512" height="384">
+        	    <img src="./images/dino_run_title.png" border="3" width="512" height="360">
       	    </td>
             <td style="padding:5px" align="center">
-            	<img src="./images/dino_run_play.gif" border="3" width="512" height="384">
+            	<img src="./images/dino_run_play.gif" border="3" width="512" height="360">
              </td>
         </tr>
     </table>
