@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./images/dino_run_title.png">
+    <img src="./images/dino_run_title.png" width="640" height="480" >
 </p>
 
 # RunDinoRun
