@@ -80,7 +80,7 @@ PteroVPos   zmb     1                       ; Pterodactyl vertical position
 TotDist     zmb     2                       ; Total distance traveled
 Timer       zmb     2                       ; Simple 2-byte timer (0-65535)
 DinoYPos    zmb     2                       ; Dino Y-position on screen
-GameLevel   zmb     1                       ; Current Game Level (0-3)
+GameLevel   zmb     1                       ; Current Game Level (0-7)
 FirstGame   zmb     1                       ; First Game Flag
 PauseState  zmb     1                       ; Game pause status
 DemoMode    zmb     1                       ; Demo Mode flag
@@ -146,7 +146,7 @@ freq3       addd    #$0000
             rora
             adda    <sum2+1
             rora
-            sta     $ff20           ;dac mixedsa
+            sta     $ff20                   ; DAC mixedsa
             lda     $ff93
 saved       ldd     #0000
             rti
@@ -205,10 +205,10 @@ v3          ldu     freqtab                 ; get the right freq3
             beq     DonePlay                ; at zero? done playing
             rts
             
-DonePlay    stx     <curnote+1              
-            lda     #NOTE_REPEAT
-            lda     noterepeat
-            sta     <repeatnote
+DonePlay    stx     <curnote+1              ; remember current note
+            lda     #NOTE_REPEAT            ; get repeat pointer
+            lda     noterepeat              ; get repeat count
+            sta     <repeatnote             ; store it
             rts
 ;}
 
@@ -307,10 +307,10 @@ start2      nop
             sta     $ffd9                   ; high-speed
 
             lda     #$d8
-            sta     $ff90                   ; gime firq enabled
+            sta     $ff90                   ; CoCo 1/2 mode, GIME FIRQ enabled
             lda     #32
-            sta     $ff91
-            sta     $ff93
+            sta     $ff91                   ; 269.365 ns clock, MMU FFA0-FFA7
+            sta     $ff93                   ; FIRQ enabled, keyboard FIRQ
             
             ldd     #460                    ; timer value (12bit) (8Khz)
             std     $ff94                   ; 1/7800 -> / 0.000000279 = 460
