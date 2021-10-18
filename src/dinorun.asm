@@ -5,8 +5,8 @@
 ;*            written by                                                       *
 ;*            Paul Fiscarelli and Simon Jonassen                               *
 ;*                                                                             *
-;*            v1.1.1                                                           *
-;*            November 14, 2019                                                *
+;*            v1.2  (CoCoTALK! Game On Challenge Special Edition)              *
+;*            October 3, 2021                                                  *
 ;*                                                                             *
 ;*******************************************************************************
 
@@ -171,6 +171,7 @@ DoMusic     dec     <musicframe
             lda     #MUSC_CYCLE
             sta     <musicframe
 ;{
+
             
 ;*******************************************************************************
 ;*                                                                             *
@@ -261,7 +262,7 @@ MINDIS_CACT equ     1                       ; Minimum spacing distance between C
 MINDIS_PTER equ     1                       ; Minimum spacing distance between Pterodactyl
 MINDIS_OBST equ     1                       ; Minimum spacing distance between any two Obstacles
 GRND_CONT   equ     6                       ; Counter for adding new ground
-HASH_VALUE  equ     $FFFF                   ; Easter Egg 1
+HASH_VALUE  equ     $FA58                   ; Easter Egg 1
 DINO_GOD    equ     $7E82                   ; Easter Egg 2
 DINO_BOT    equ     $1815                   ; Easter Egg 3
 LEVEL_1     equ     200                     ; Set value to finish level 1
@@ -576,35 +577,71 @@ stor        inc     picptr+2                ; increment our pointer (self-modify
 ;*******************************************************************************
 ;{          doDemo
 doDemo
-            jsr     StageGame               ; go handle staging game
-DemoMain    
-            jsr     HandleTime              ; go handle time
-            jsr     CheckInput              ; go check for user input
-            lda     InputFlag               ; grab input flag
-            beq     DemoCont                ; input set? no - continue demo
-            clr     InputFlag               ; clear the flag
-            clr     DemoMode                ; reset demo mode flag
-            jsr     InitVars                ; go initialize vars
-            jmp     NewGame                 ; go start new game
+            jsr     StageGame
+            jsr     DemoMessage
+            jsr     DemoMessage2
+DemoMain
+            jsr     HandleTime
+            jsr     CheckInput
+            lda     InputFlag
+            beq     DemoCont
+            clr     InputFlag
+            clr     DemoMode
+            jsr     InitVars
+            jmp     NewGame
 DemoCont            
-            dec     cyclegame               ; cycle game counter
-            bne     DemoMore                ; not zero? go do more
-            lda     #GAME_CYCLE             ; reset game counter
-            sta     cyclegame               ; store game counter
-            jsr     ScoreHandle             ; go handle score
-            jsr     DemoControls            ; go handle demo controls
-            jsr     doDino                  ; go animate Dino
-            jsr     HandleCollision         ; go handle collisions
-            dec     cyclemount              ; cycle mountain counter
-            bne     DemoMain                ; at zero? no - loop to Main
-            lda     newmntspeed             ; get mountain speed
-            sta     cyclemount              ; reset mountain counter
-            jsr     doMonts                 ; go do mountains
+            dec     cyclegame
+            bne     DemoMore
+            lda     #GAME_CYCLE
+            sta     cyclegame
+            jsr     ScoreHandle
+            jsr     DemoControls
+            jsr     doDino
+            jsr     HandleCollision
+            dec     cyclemount
+            bne     DemoMain
+            lda     newmntspeed
+            sta     cyclemount
+            jsr     doMonts
 DemoMore
-            jsr     doGround                ; go draw some ground
-            jsr     doObstacle              ; go handle obstacles
-DemoDone    
-            bra     DemoMain                ; always loop demo main
+            jsr     doGround
+            jsr     doObstacle
+            
+DemoDone    bra     DemoMain
+            rts
+;}
+
+
+;*******************************************************************************
+;*                                                                             *
+;*          Demo Message (show message in demo mode)                           *
+;*                                                                             *
+;*******************************************************************************
+;{          DemoMessage
+DemoMessage
+            ldx     #demomess1          ; get demo message text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0404    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            
+            rts
+;}
+
+
+;*******************************************************************************
+;*                                                                             *
+;*          Demo Message2 (show message in demo mode)                          *
+;*                                                                             *
+;*******************************************************************************
+;{          DemoMessage2
+DemoMessage2
+            ldx     #demomess2          ; get demo message text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0546    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            
             rts
 ;}
 
@@ -2147,27 +2184,65 @@ HMoreFont
 ;*******************************************************************************
 ;{          HandleTitle
 HandleTitle
-            jsr     TitlePage               ; go handle title page
-            clr     DemoMode                ; make sure demo is clear
-            clr     Timer                   ; reset timer for timeout
-            inc     DemoMode                ; get ready for demo mode
-            jsr     InitVars                ; go init vars
+            jsr     TitlePage
+
+            clr     DemoMode            ; make sure demo is clear
+            clr     Timer               ; reset timer for timeout
+            inc     DemoMode            ; get ready for demo mode
+            jsr     InitVars
+            
 CycleInput  
-            jsr     CheckInput              ; go check for user input
-            jsr     HandleTime              ; go handle timer
-            lda     Timer                   ; grab timer value
-            cmpa    #$48                    ; check if arbitrary time has passed
-            blo     ChckInput               ; no? go check input
-            jmp     doDemo                  ; always go handle demo
+            jsr     CheckInput
+            jsr     HandleTime
+            lda     Timer
+            cmpa    #$36
+            blo     ChckInput
+            jsr     HandleInstr
+            
+            jmp     doDemo
 ChckInput            
-            lda     InputFlag               ; grab input flag
-            beq     CycleInput              ; no input? go check again
-            clr     DemoMode                ; clear demo mode flag
-            jsr     InitVars                ; go init vars
-            jmp     NewGame                 ; always go handle new game
+            lda     InputFlag
+            beq     CycleInput
+            
+            clr     DemoMode
+            
+            jsr     InitVars
+            jmp     NewGame
 
             rts
 ;}
+
+
+;*******************************************************************************
+;*                                                                             *
+;*          Handle Instruction Page                                            *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : a                                                        *
+;*                                                                             *
+;*******************************************************************************
+;{          HandleInstr
+HandleInstr
+            jsr     InstructPage
+            clr     Timer
+CycleInput2 
+            jsr     CheckInput
+            jsr     HandleTime
+            lda     Timer
+            cmpa    #$36
+            blo     ChckInput2
+            bra     DoneInstr
+ChckInput2            
+            lda     InputFlag
+            beq     CycleInput2
+            clr     DemoMode
+            
+            jsr     InitVars
+            jmp     NewGame
+DoneInstr
+            rts
+;}
+
  
 ;*******************************************************************************
 ;*                                                                             *
@@ -2236,6 +2311,123 @@ TitlePage
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
 DoneTitle
+            rts
+;}
+
+
+;*******************************************************************************
+;*                                                                             *
+;*          Instructions Page                                                  *
+;*           Input  : none                                                     *
+;*           Output : none                                                     *
+;*           Used   : b,x                                                      *
+;*                                                                             *
+;*******************************************************************************
+;{          InstructPage
+InstructPage   
+            ldb     #08                 ; Text plot speed (frames)
+            stb     wvs+1               ; Store v-sync count
+            jsr     wvs                 ; Go print text
+
+            ldx     #blank              ; get blank text
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0A00    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+
+            ldx     #blank              ; get blank text
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0C00    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            
+            ldx     #blank              ; get blank text
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0E00    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            
+            ldx     #blank              ; get blank text
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1100    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            
+            ldx     #blank              ; get blank text
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1240    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            
+            ldx     #blank              ; get blank text
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1340    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            
+            ldx     #blank              ; get blank text
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1500    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+
+            ldx     #instruct1          ; get instruction text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0B0A    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs
+
+            ldx     #headerrow          ; get header text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0D01    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs            
+            
+            ldx     #instruct2          ; get instructions text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$0F02    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs
+
+            ldx     #instruct3          ; get instructions text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1002    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs
+
+            ldx     #instruct4          ; get instructions text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1102    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs
+
+            ldx     #instruct5          ; get instructions text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1202    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs
+
+            ldx     #instruct6          ; get instructions text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1302    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs
+            
+            ldx     #headerrow          ; get header text memory index
+            stx     StringLoc           ; store in string location var
+            ldx     #VID_START+$1501    ; location to print on screen
+            stx     PrintAtLoc          ; store location to print at
+            jsr     PrintAtGr           ; Go print text
+            jsr     wvs            
+
+DoneInstuct
             rts
 ;}
 
@@ -2369,7 +2561,6 @@ DoneLetters
 ;{          andWord
 andWord                                     ; hack for center text (plots as graphic object)
             ldx     PrintAtLoc
-            ;ldu     StringLoc
             ldu     #andcredits
 bigAND      ldb     #4
 littleAND   lda     ,u+
@@ -2659,6 +2850,15 @@ title3      fcn     '3-VOICE MUSIC PLAYER'
 title4      fcn     ' AND'
 title5      fcn     'ADVISOR OF MADNESS'
 title6      fcn     'SIMON JONASSEN'
+headerrow   fcn     '*****************************'
+instruct1   fcn     'INSTRUCTIONS'
+instruct2   fcn     'JUMP....<SPACE> OR BUTTON-1'
+instruct3   fcn     'DUCK....<ENTER> OR BUTTON-2'
+instruct4   fcn     'SKIP....<R-ARROW> KEY'
+instruct5   fcn     'MUTE....<M> KEY'
+instruct6   fcn     'PAUSE...<P> KEY'
+demomess1   fcn     'WELCOME TO THE COCOTALK'
+demomess2   fcn     'GAME ON CHALLENGE!!'
 othertxt1   fcn     '**************************'
 othertxt2   fcn     '************************'
 
@@ -2701,6 +2901,6 @@ dinotune2
 dinotune3            
             include	    ".\include\dinorun\dinotun3.asm"            
             
-version     fcn     'v1.1.1 11-14-19'
+version     fcn     'v1.2 10-03-21'
             
             end     Start

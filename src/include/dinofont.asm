@@ -78,8 +78,8 @@ placeholders
             fcb     $99,$80,$F9,$F9
             fcb     $FF,$FF,$FF,$FF ; 'SPACE' 
             fcb     $FF,$FF,$FF,$FF
-            fcb     $FF,$E1,$CF,$9F ; 'blah' 
-            fcb     $81,$9C,$9C,$C1
+            fcb     $FF,$F1,$F1,$E3 ; '!' 
+            fcb     $E7,$EF,$FF,$DF
             fcb     $FF,$80,$8C,$F9 ; 'blah' 
             fcb     $F3,$E7,$E7,$E7
             fcb     $FF,$C3,$9D,$8D ; 'blah' 
@@ -96,16 +96,16 @@ placeholders
             fcb     $E1,$FC,$9C,$C1
             fcb     $FF,$F1,$E1,$C9 ; 'blah' 
             fcb     $99,$80,$F9,$F9
-            fcb     $FF,$81,$9F,$81 ; 'blah' 
-            fcb     $FC,$FC,$9C,$C1
+            fcb     $FF,$F7,$D5,$E3 ; '*' 
+            fcb     $E3,$D5,$F7,$FF
             fcb     $FF,$E1,$CF,$9F ; 'blah' 
             fcb     $81,$9C,$9C,$C1
             fcb     $FF,$80,$8C,$F9 ; 'blah' 
             fcb     $F3,$E7,$E7,$E7
-            fcb     $FF,$FF,$FF,$80 ; '-' 
-            fcb     $01,$FF,$FF,$FF
-            fcb     $FF,$C1,$9C,$9C ; 'blah' 
-            fcb     $C0,$FC,$F9,$C3          
+            fcb     $FF,$FF,$FF,$C1 ; '-' 
+            fcb     $83,$FF,$FF,$FF
+            fcb     $FF,$FF,$FF,$FF ; '.' 
+            fcb     $FF,$FF,$F3,$F3          
             fcb     $FF,$C1,$9C,$9C ; 'blah' 
             fcb     $C0,$FC,$F9,$C3          
 numbers
@@ -131,4 +131,12 @@ numbers
             fcb     $C0,$FC,$F9,$C3 
             fcb     $FF,$FF,$9F,$9F ; ':' 
             fcb     $FF,$9F,$9F,$FF             
+            fcb     $FF,$FF,$9F,$9F ; 'blah' 
+            fcb     $FF,$9F,$9F,$FF              
+            fcb     $FF,$F3,$E7,$CF ; '<' 
+            fcb     $9F,$CF,$E7,$F3
+            fcb     $FF,$FF,$9F,$9F ; 'blah' 
+            fcb     $FF,$9F,$9F,$FF
+            fcb     $FF,$E7,$F3,$F9 ; '>' 
+            fcb     $FC,$F9,$F3,$E7  
             
