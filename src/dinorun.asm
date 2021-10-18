@@ -5,8 +5,8 @@
 ;*            written by                                                       *
 ;*            Paul Fiscarelli and Simon Jonassen                               *
 ;*                                                                             *
-;*            v1.2  (CoCoTALK! Game On Challenge Special Edition)              *
-;*            October 3, 2021                                                  *
+;*            v1.2.1                                                           *
+;*            October 17, 2021                                                 *
 ;*                                                                             *
 ;*******************************************************************************
 
@@ -578,8 +578,6 @@ stor        inc     picptr+2                ; increment our pointer (self-modify
 ;{          doDemo
 doDemo
             jsr     StageGame
-            jsr     DemoMessage
-            jsr     DemoMessage2
 DemoMain
             jsr     HandleTime
             jsr     CheckInput
@@ -608,40 +606,6 @@ DemoMore
             jsr     doObstacle
             
 DemoDone    bra     DemoMain
-            rts
-;}
-
-
-;*******************************************************************************
-;*                                                                             *
-;*          Demo Message (show message in demo mode)                           *
-;*                                                                             *
-;*******************************************************************************
-;{          DemoMessage
-DemoMessage
-            ldx     #demomess1          ; get demo message text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0404    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
-            
-            rts
-;}
-
-
-;*******************************************************************************
-;*                                                                             *
-;*          Demo Message2 (show message in demo mode)                          *
-;*                                                                             *
-;*******************************************************************************
-;{          DemoMessage2
-DemoMessage2
-            ldx     #demomess2          ; get demo message text memory index
-            stx     StringLoc           ; store in string location var
-            ldx     #VID_START+$0546    ; location to print on screen
-            stx     PrintAtLoc          ; store location to print at
-            jsr     PrintAtGr           ; Go print text
-            
             rts
 ;}
 
@@ -2857,8 +2821,6 @@ instruct3   fcn     'DUCK....<ENTER> OR BUTTON-2'
 instruct4   fcn     'SKIP....<R-ARROW> KEY'
 instruct5   fcn     'MUTE....<M> KEY'
 instruct6   fcn     'PAUSE...<P> KEY'
-demomess1   fcn     'WELCOME TO THE COCOTALK'
-demomess2   fcn     'GAME ON CHALLENGE!!'
 othertxt1   fcn     '**************************'
 othertxt2   fcn     '************************'
 
@@ -2901,6 +2863,6 @@ dinotune2
 dinotune3            
             include	    ".\include\dinorun\dinotun3.asm"            
             
-version     fcn     'v1.2 10-03-21'
+version     fcn     'v1.2.1 10-17-21'
             
             end     Start
