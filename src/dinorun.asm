@@ -17,7 +17,7 @@
 ;*                                                                             *
 ;*******************************************************************************
             org     $176
-            jmp     Start		
+            jmp     Start
 
 
 ;*******************************************************************************
@@ -26,18 +26,18 @@
 ;*                                                                             *
 ;*******************************************************************************
             org     $400
-            includebin ".\include\dinorun\screen.bin"
+            includebin "screen.bin"
 
-            
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Reserve space for DP variables                                     *
 ;*                                                                             *
 ;*******************************************************************************
             org     VID_START+$2500         ; set start of DP variables
-            opt     6809            
+            opt     6809
             opt     cd
-            
+
 ;{
 cactusani                                   ; initialize obstacle pointers
             fdb     obstacle01
@@ -55,8 +55,8 @@ cactusani                                   ; initialize obstacle pointers
             fdb     obstacle13
             fdb     obstacle14
             fdb     obstacle15
-            fdb     obstacle16            
-            
+            fdb     obstacle16
+
 vars        equ     *                       ; start of variable space
 
 ButtonFlag  zmb     1                       ; Joy button state
@@ -133,14 +133,14 @@ jumpheight  fcb     0,28,23,19,15,12,9,7,5,4,3,2,1,0,0,0,1,2,3,4,5,7,9,12,15,19,
 ;*******************************************************************************
 ;{
 note        std     <saved+1
-sum         ldd     #$0000 
-freq        addd    #$0000 
+sum         ldd     #$0000
+freq        addd    #$0000
             std     <sum+1
 sum2        ldd     #$0000
 freq2       addd    #$0000
-            std     <sum2+1 
-sum3        ldd     #$0000 
-freq3       addd    #$0000 
+            std     <sum2+1
+sum3        ldd     #$0000
+freq3       addd    #$0000
             std     <sum3+1
             adda    <sum+1
             rora
@@ -172,7 +172,7 @@ DoMusic     dec     <musicframe
             sta     <musicframe
 ;{
 
-            
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Note Sequencer                                                     *
@@ -182,15 +182,15 @@ DoMusic     dec     <musicframe
 ;*                                                                             *
 ;*******************************************************************************
 ;{          play2
-play2 
+play2
 
 curnote     ldx     #dinotune1
             ldd     ,x++                    ; load 2 notes from pattern
             bpl     play                    ; go play if positive
             jsr     GetTune                 ; go get new tune
 play        asla                            ; times 2 for note freq lookup
-            aslb                            
-            sta     <v1+2 
+            aslb
+            sta     <v1+2
             stb     <v2+2
             lda     ,x+
             asla                            ; times 2 for note freq lookup
@@ -205,7 +205,7 @@ v3          ldu     freqtab                 ; get the right freq3
             dec     repeatnote              ; check for note repeat
             beq     DonePlay                ; at zero? done playing
             rts
-            
+
 DonePlay    stx     <curnote+1              ; remember current note
             lda     #NOTE_REPEAT            ; get repeat pointer
             lda     noterepeat              ; get repeat count
@@ -284,11 +284,11 @@ COCO_SCORE  equ     6809                    ; Set value to hit secret level
 ;*           Used   : a,d,dp,cc                                                *
 ;*                                                                             *
 ;*******************************************************************************
-;{ 
+;{
             org     VID_START+$2600         ; start of excecutable code
 
 Start       clr     $FF40                   ; stop drives from spinning
-    
+
             jsr     RGB_PALETTE             ; RGB palette
             orcc    #$50
 
@@ -298,10 +298,10 @@ Start       clr     $FF40                   ; stop drives from spinning
             ldd     #start2
             std     $72
 
-start2      nop 		
+start2      nop
             lda     #vars/256               ; fix DP register for variable space
             tfr     a,dp                    ; store DP
-           		
+
             setdp   $29                     ; set DP
 
             sta     $ffd7                   ; high-speed
@@ -312,18 +312,18 @@ start2      nop
             lda     #32
             sta     $ff91                   ; 269.365 ns clock, MMU FFA0-FFA7
             sta     $ff93                   ; FIRQ enabled, keyboard FIRQ
-            
+
             ldd     #460                    ; timer value (12bit) (8Khz)
             std     $ff94                   ; 1/7800 -> / 0.000000279 = 460
-;}            
-            
+;}
+
 ;*******************************************************************************
 ;*          Initiate DP at JMP vector                                          *
-;*******************************************************************************       
+;*******************************************************************************
 ;{
             lda	    #$0e                    ; DP JMP instruction
             ldb	    #note&$ff               ; address of player
-            std	    >$fef4                  ; IRQ JUMP VECTOR 
+            std	    >$fef4                  ; IRQ JUMP VECTOR
 ;}
 
 ;*******************************************************************************
@@ -351,9 +351,9 @@ Graphics    lda     #$F0                    ; Pmode 4 (G6R) - Color Set 1
 
             sta     $FFC9                   ; set video start at $0400
 
-ShowTitle            
+ShowTitle
             jsr     HandleTitle             ; go draw title screen
-NewGame            
+NewGame
             jsr     StageGame               ; go stage game content
             jsr     StartGame               ; go initialize game
 Main
@@ -368,10 +368,10 @@ Main
             beq     DoControls              ; not bot mode? go do controls
             jsr     DemoControls            ; use demo mode
             bra     MainCont                ; always go to main continue
-DoControls                                  
+DoControls
             jsr     ChckButton              ; go check buttons
             jsr     ChckKeybd               ; go check keyboard
-MainCont            
+MainCont
             jsr     doDino                  ; go animate Dino
             jsr     HandleCollision         ; go handle collisions
             jsr     OtherKeys               ; go check other keys (POLCAT)
@@ -380,12 +380,12 @@ MainCont
             lda     newmntspeed             ; get mountain speed
             sta     cyclemount              ; reset mountain counter
             jsr     doMonts                 ; go do mountains
-More        
-            
+More
+
             jsr     doSound                 ; go handle sound
             jsr     doGround                ; go handle ground
             jsr     doObstacle              ; go handle obstacles
-            
+
 Done        bra     Main                    ; always loop Main
 ;}
 
@@ -399,16 +399,16 @@ Done        bra     Main                    ; always loop Main
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ClearGraphics
-ClearGraphics            
+ClearGraphics
             ldd     #$FFFF
             ldx     #VID_START              ; beginning of video space
 GraphicCLR  std     ,x++                    ; store 2-bytes
             cmpx    #VID_END                ; clear $2800-$2C80 for temp space
             blo     GraphicCLR              ; are we there yet? no - go for more
-            
+
             ldd     #$0000                  ; clear temp space
             ldx     #VID_START+$1B00        ; offset from video space
-GraphicCLR2 
+GraphicCLR2
             std     ,x++                    ; store 2-bytes
             cmpx    #VID_START+$24FF        ; clear through $28FF for temp space
             blo     GraphicCLR2             ; are we done? no - go do more
@@ -427,14 +427,14 @@ GraphicCLR2
 ;*******************************************************************************
 ;{          GetTune
 GetTune
-            dec     tuneselect              ; decrement tune counter        
+            dec     tuneselect              ; decrement tune counter
             beq     playTune1               ; at zero? yes - go play first tune
             lda     tuneselect              ; load tune number
             cmpa    #02                     ; set to tune-2?
             beq     playTune2               ; yes? go play tune-2
 playTune3   ldx     #dinotune3              ; default to tune-3
             stx     <curnote+1              ; store notes in our pointer (self-modifying)
-            ldd     ,x++                    ; get beginning 2 notes from pattern - cont            
+            ldd     ,x++                    ; get beginning 2 notes from pattern - cont
             rts
 playTune2   ldx     #dinotune2              ; set index to tune-2
             stx     <curnote+1              ; store notes in our pointer (self-modifying)
@@ -446,7 +446,7 @@ playTune1   lda     #03                     ; reset tune counter
             stx     <curnote+1              ; store notes in our pointer (self-modifying)
             ldd     ,x++                    ; get beginning 2 notes from pattern - cont
             rts
-;}            
+;}
 
 
 ;*******************************************************************************
@@ -498,7 +498,7 @@ mloop       ldd     1,x                     ; do a full scan line
             lda     ,u
             sta     31,x
 
-            leau    64,u	
+            leau    64,u
             leax    32,x
             leay    -1,y
             bne     mloop                   ; done? no - go do more
@@ -520,7 +520,7 @@ mloop       ldd     1,x                     ; do a full scan line
 ;*                                                                             *
 ;*******************************************************************************
 ;{          NewMonts
-NewMonts    
+NewMonts
             lda     #$3c                    ; load mountain height (scan lines)
 
 picptr      ldx     #pic                    ; grab mountain column location
@@ -587,7 +587,7 @@ DemoMain
             clr     DemoMode
             jsr     InitVars
             jmp     NewGame
-DemoCont            
+DemoCont
             dec     cyclegame
             bne     DemoMore
             lda     #GAME_CYCLE
@@ -604,7 +604,7 @@ DemoCont
 DemoMore
             jsr     doGround
             jsr     doObstacle
-            
+
 DemoDone    bra     DemoMain
             rts
 ;}
@@ -622,7 +622,7 @@ DemoDone    bra     DemoMain
 DemoControls
             lda     JumpState
             bne     DoneDemoH
-            
+
             lda     curobst1
             beq     ChckOB2
             jsr     DemoJump1
@@ -633,7 +633,7 @@ ChckOB2
             beq     ChckOB3
             jsr     DemoJump1
             lda     JumpState
-            bne     DoneDemoH            
+            bne     DoneDemoH
 ChckOB3
             lda     curobst3
             beq     ChckOB4
@@ -647,7 +647,7 @@ ChckOB4
             lda     JumpState
             bne     DoneDemoH
             bra     PteroDemo
-            
+
 DemoJump1
             cmpa    #$3F
             bhi     DoneDemoH
@@ -661,18 +661,18 @@ DemoJump1
             clr     curobst2
 DoJump
             lda     #JUMP_FRAMES            ; 15-frames in jump animation
-            sta     JumpState 
+            sta     JumpState
             rts
-            
-PteroDemo    
+
+PteroDemo
             lda     PteroFlag
             beq     DoneDemoH
             lda     JumpState
             bne     DoneDemoH
-JumpStart   
+JumpStart
             lda     PteroVPos
             bne     DemoJump2
-DemoDuck     
+DemoDuck
             lda     DuckState
             bne     DoneDemoH
             lda     PteroHPos
@@ -681,9 +681,9 @@ DemoDuck
             cmpa    #$30
             blo     DoneDemoH
             lda     #35
-            sta     DuckState           
+            sta     DuckState
             bra     DoneDemoH
-DemoJump2     
+DemoJump2
             lda     PteroHPos
             cmpa    #$40
             bhi     DoneDemoH
@@ -696,7 +696,7 @@ DoneDemoH
             bne     ReallyDone
             lda     #4
             sta     duckframe
-ReallyDone            
+ReallyDone
             rts
 ;}
 
@@ -710,14 +710,14 @@ ReallyDone
 ;*                                                                             *
 ;*******************************************************************************
 ;{          StageGame
-StageGame            
+StageGame
             jsr     ClearGraphics           ; go clear graphic screen
             jsr     doMoon                  ; go draw moon
             jsr     ResetScore              ; go reset score
             lda     FirstGame               ; grab first game played flag
             beq     SkipHigh                ; first game? no high score to display
             jsr     ShowHigh                ; go handle high score
-SkipHigh            
+SkipHigh
             jsr     NewMonts                ; go do new mountains
             jsr     NewGround               ; go draw new ground
             jsr     dinoBegEnd              ; go draw new Dino
@@ -741,10 +741,10 @@ StartGame
             inca                            ; increment it (now 1-4)
             sta     tuneselect              ; store it in tune select (random tune)
             jsr     GetTune                 ; go get new tune
-            
+
             lda     HScrUnit                ; grab units-place of high score
             bne     SkipInternet            ; not zero? skip internet message
-            
+
             ldx     #nointernet             ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$16D4        ; location to print on screen
@@ -753,7 +753,7 @@ StartGame
 
 SkipInternet
             jsr     WaitForInput            ; go wait for user input
-            
+
             ldx     #blank                  ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$16C0        ; location to print on screen
@@ -781,7 +781,7 @@ ReturnMain
 ;*                                                                             *
 ;*******************************************************************************
 ;{          NewGround
-NewGround    
+NewGround
             ldx     #GRND_POS               ; set index of ground scan line
 
 loopGround
@@ -790,26 +790,26 @@ loopGround
             sta     32,x                    ; store it next scan line down
             coma                            ; invert it
             sta     ,x+                     ; store at current scan line, index to next byte column
-            
+
             cmpx    #GRND_POS+DINO_XOFST    ; put some ground in temp space
-            blo     ContGround              
+            blo     ContGround
             cmpx    #GRND_POS+DINO_XOFST+2
             bhi     ContGround
-            sta     SCRL_OFFSET+56,x       
+            sta     SCRL_OFFSET+56,x
             sta     OBST_TEMPOF+64,x
             coma
             sta     SCRL_OFFSET+24,x
             sta     OBST_TEMPOF+32,x
-ContGround            
+ContGround
             cmpx    #GRND_POS+32
             bne     loopGround
-            
+
             sta     VID_START+$1AC0         ; put ground offscreen for rols
             sta     VID_START+$1AE1
             coma
             sta     VID_START+$1AE0
             sta     VID_START+$1AC1
-            
+
             rts
 ;}
 
@@ -837,10 +837,10 @@ doGround
             sta     VID_START+$1AE0         ; place in temp space
             sta     VID_START+$1AC1         ; place off screen
             sta     VID_START+$1AE2         ; place in temp space
-doneGround  
+doneGround
             rts
 ;}
-            
+
 
 ;*******************************************************************************
 ;*                                                                             *
@@ -851,12 +851,12 @@ doneGround
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doObstacle
-doObstacle  
+doObstacle
             dec     obstcldist              ; check min distance between obstacles
             bne     GoScroll
 
             inc     obstcldist
-            
+
             dec     cactusdist
             bne     TryPtero
             inc     cactusdist
@@ -868,9 +868,9 @@ doObstacle
             sta     cyclecactus
             lda     MINDIS_OBST
             sta     obstcldist
-AddCactus   
+AddCactus
             jsr     doCactus
-            
+
             ldx     TotDist
             cmpx    #100
             blo     GoCycle
@@ -878,11 +878,11 @@ AddCactus
             bne     GoCycle
             lda     DinoBot
             beq     GoScroll
-GoCycle            
+GoCycle
             jsr     CycleObst
-           
+
             bra     GoScroll
-TryPtero    
+TryPtero
             lda     GameLevel               ; Pteros only level-2 and above
             cmpa    #$02
             blo     GoScroll
@@ -897,12 +897,12 @@ TryPtero
             sta     cycleptero
             lda     MINDIS_OBST
             sta     obstcldist
-AddPtero    
-            jsr     doPtero            
-GoScroll    
+AddPtero
+            jsr     doPtero
+GoScroll
             jsr     ScrollObst
             rts
-;}            
+;}
 
 
 ;*******************************************************************************
@@ -914,7 +914,7 @@ GoScroll
 ;*                                                                             *
 ;*******************************************************************************
 ;{          CycleObst
-CycleObst    
+CycleObst
             lda     curobst1
             bne     OBcheck2
             lda     #$FF
@@ -941,7 +941,7 @@ Set4
             sta     curobst4
             rts
 ;}
- 
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Draw Moon                                                          *
@@ -984,7 +984,7 @@ doneMoon
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doCactus
-doCactus    
+doCactus
             ldx     TotDist
             cmpx    #COCO_SCORE
             blo     OtherObst
@@ -992,7 +992,7 @@ doCactus
             bhi     OtherObst
             ldy     #coco6809
             bra     DrawCactus
-OtherObst            
+OtherObst
             jsr     GetRandom
             anda    #%00000011              ; get 1-of-4 in lower nibble
             sta     TempByte
@@ -1016,7 +1016,7 @@ loopCactus  lda     ,y+
             sta     ,x
             abx
             bra     loopCactus
-doneCactus  
+doneCactus
             sta     VID_START+$1AE0
             lda     MINDIS_CACT
             sta     cactusdist
@@ -1033,7 +1033,7 @@ doneCactus
 ;*                                                                             *
 ;*******************************************************************************
 ;{          doPtero
-doPtero     
+doPtero
             lda     PteroFlag               ; grab pterodactyl flag
             bne     skipPtero               ; already on screen? yes - go skip
             lda     GameLevel               ; load game level
@@ -1059,13 +1059,13 @@ loopPtero   lda     ,y+                     ; get bytes
             sta     ,x                      ; store byte on screen
             leax    30,x                    ; index to next scan line (minus bytes for sprite width)
             bra     loopPtero               ; always loop for more
-donePtero   
+donePtero
             coma                            ; reset Dino position counter
             sta     PteroHPos               ; store it
             sta     PteroFlag               ; reset ptero on-screen flag
             lda     MINDIS_PTER             ; get minimum distance for next sprite
             sta     pterodist               ; store it
-skipPtero            
+skipPtero
             rts
 ;}
 
@@ -1096,7 +1096,7 @@ DeadDino                                    ; draw dead Dino
             dec     JumpState               ; decrement jump state (collision happened before)
             ldu     #dinodeadji             ; grab index of dead Dino jumping sprite
             bra     dinoLoop                ; go to Dino draw loop
-BeginDino            
+BeginDino
             ldx     #DINO_START+DINO_XOFST-$60 ; set index of starting Dino
             ldu     #dinostandi             ; set pointer of start Dino sprite
 dinoLoop
@@ -1114,7 +1114,7 @@ dinoLoop
             sta     2,x                     ; store it two byte columns over
             leax    32,x                    ; index scan line
             bra     dinoLoop                ; always loop Dino draw
-dinoDone            
+dinoDone
             rts
 ;}
 
@@ -1139,25 +1139,25 @@ doDino
             dec     duckframe
             ldu     #dinoduck1clear
             bra     DrawDino
-DinoDuck    
+DinoDuck
             ldy     #DINO_START+$02C0
             sty     DinoFeet
             ldx     #DINO_START+DINO_XOFST+384
             dec     duckframe
             beq     DuckFrame1
-DuckFrame2  
+DuckFrame2
             ldu     #dinoduck2i
             bra     DrawDino
-DuckFrame1  
+DuckFrame1
             lda     #DUCK_FRAME
             sta     duckframe
             ldu     #dinoduck1i
             bra     DrawDino
 
-CheckJump   
+CheckJump
             lda     JumpState
             beq     RunDino
-DinoJump    
+DinoJump
             ldy     #DINO_START+$0200
             sty     DinoFeet
             leax    JUMP_OFFSET,x
@@ -1169,7 +1169,7 @@ DinoJump
             dec     JumpState
             ldu     #dinostandi
             bra     DrawDino
-            
+
 RunDino     ldy     #DINO_START+$0280
             sty     DinoFeet
             dec     dinoframe
@@ -1184,7 +1184,7 @@ run_dino1   ldu     #dinorun1i
 
 DrawDino                                    ; Draw Dino on screen and check collisions
             stx     DinoYPos                ; save where we're at
-LoopDino    
+LoopDino
             ldd     ,u++
             cmpa    #$AA
             beq     doneDino
@@ -1195,7 +1195,7 @@ LoopDino
             coma
             comb
             std     ,x+
-SkipColl1   
+SkipColl1
             lda     TempByte+1              ; check for collision
             beq     SkipColl2
             clra
@@ -1209,7 +1209,7 @@ SkipColl1
             inc     JumpState               ; put Dino back to where he was
 NoJump
             bra     HandleCollision
-SkipColl2   
+SkipColl2
             leax    1,x
             lda     ,u+
             sta     TempByte
@@ -1217,10 +1217,10 @@ SkipColl2
             ora     OBST_TEMPOF+32,x
             coma
             sta     ,x
-SkipColl3   
+SkipColl3
             leax    30,x
             bra     LoopDino
-doneDino    
+doneDino
             rts
 ;}
 
@@ -1239,18 +1239,18 @@ HandleCollision
             bne     CollDone                ; enable? done with collision check
             lda     CollFlag                ; already have a collision?
             beq     CollDone                ; no? done with collision check
-KillDino    
+KillDino
             jsr     doObstacle              ; go do obstacle (collision detect before obstacle moved)
             lda     JumpState               ; check jump state
             cmpa    #$13                    ; less than middle of jump?
             blo     SkipObst                ; yes - skip another obstacle scroll
             jsr     doObstacle              ; go do another obstacle scroll (collision detect before obstacle moved)
-SkipObst            
+SkipObst
             jsr     dinoBegEnd              ; go do Dino end (dead) position
             lda     DemoMode                ; check if we were in demo mode
             bne     doDemoOver              ; yes? go do demo over
             bra     doGameOver              ; always go to game over
-CollDone    
+CollDone
             clr     CollFlag                ; clear collision flag
             rts
 ;}
@@ -1269,31 +1269,31 @@ doGameOver
             lda     $FF23                   ; turn off music
             anda    #%11110111
             sta     $FF23
-            
+
             ldx     #gameover               ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$0F0B        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
-            
+
             jsr     HandleHigh
-            
+
             ldx     #$5000                  ; hang tight to clear keys and buttons
-DelayLoop   leax    -1,x                    ; decrement index    
+DelayLoop   leax    -1,x                    ; decrement index
             bne     DelayLoop               ; done? no - go loop more
-            
+
             clr     Timer                   ; clear the timer
-            
+
 OverInput   jsr     CheckInput              ; go check for input
             jsr     HandleTime              ; go handle timer
             lda     Timer                   ; grab timer value
             cmpa    #$E1                    ; arbitrary value of time passed
             blo     OverInputs              ; not there yet? go check inputs
             bra     ContDemo                ; go continue demo
-OverInputs            
+OverInputs
             lda     InputFlag               ; grab input flag
             beq     OverInput               ; user input? no - go check again
-            
+
             jsr     InitVars                ; go init vars
             jsr     ClearGraphics           ; go clear graphics
             jsr     ShowHigh                ; go handle high score
@@ -1317,17 +1317,17 @@ doDemoOver
             clr     Timer                   ; reset timer for timeout
             clr     DemoMode                ; reset demo mode flag
             clr     CollFlag                ; clear collisions
-MoreInput   
+MoreInput
             jsr     CheckInput              ; go check for input
             jsr     HandleTime              ; go handle timer
             lda     Timer                   ; grab timer value
             cmpa    #$60                    ; arbitrary time passes
             blo     CheckInputs             ; still less? yes - go check inputs
             bra     ContDemo                ; always continue demo
-CheckInputs            
+CheckInputs
             lda     InputFlag               ; grab input flag
             beq     MoreInput               ; no input? go get check again
-            
+
             clr     InputFlag               ; clear input flag
             clr     DemoMode                ; clear demo mode flag
             jsr     InitVars                ; go init vars
@@ -1350,13 +1350,13 @@ ContDemo
 InitVars
             ldx     #dinotune1              ; set index to first tune
             stx     <curnote+1              ; store notes in pointer (self modifying)
-            
+
             ldx     #pic+32                 ; load bitmap index
             stx     >ddd+1                  ; store in pointer
-            
+
             ldx     #pic                    ; set index to mountain start
             stx     >picptr+1               ; store in pointer
-            
+
             clr     CollFlag                ; clear collisions
             clr     PteroFlag               ; clear Pterodactyl flag
             clr     DuckState               ; clear ducking state
@@ -1370,13 +1370,13 @@ InitVars
             clr     curobst2                ; clear obstacle01 pointer (demo mode)
             clr     curobst3                ; clear obstacle01 pointer (demo mode)
             clr     curobst4                ; clear obstacle01 pointer (demo mode)
-            
+
             lda     #30                     ; newobheight
             ldb     #12                     ; newmntspeed
             std     newobheight             ; store them as defaults
             clr     obstaclechk             ; cleare obstacle check flag
             rts
-;}            
+;}
 
 
 ;*******************************************************************************
@@ -1388,14 +1388,14 @@ InitVars
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ChckButton
-ChckButton  
+ChckButton
             lda     PauseState              ; grab pause state flag
             bne     ChckPause               ; currently paused? yes - go handle it
             lda     KeyFlag                 ; still processing keystroke?
             bne     ButtDone                ; yes? go handle done
             lda     JumpState               ; already in jump cycle?
             bne     ButtDone
-            
+
             lda     #$FF                    ; mask keystrokes
             sta     $FF02                   ; set bits high
             lda     $FF00                   ; load PIA0 state
@@ -1404,18 +1404,18 @@ ChckButton
             lda     $FF00                   ; load PIA0 state
             anda    #%00000001              ; check right-joystick button-1
             bne     NextButt
-SetJump            
+SetJump
             lda     #JUMP_FRAMES            ; 15-frames in jump animation
             sta     JumpState               ; store it
             bra     ClearDuck               ; go clear ducking status
-JmpButtDone            
+JmpButtDone
             rts
-NextButt    
+NextButt
             lda     DuckState               ; currently in a duck state?
             bne     ButtDone                ; yes? go handle done
             lda     KeyFlag                 ; grab keyboard flag
             bne     ButtDone                ; something in buffer? go handle done
-            
+
             lda     #$FF                    ; Mask keystrokes
             sta     $FF02                   ; push outputs
             lda     $FF00                   ; grab inputs
@@ -1424,11 +1424,11 @@ NextButt
             lda     $FF00                   ; load PIA0 state
             anda    #%00000100              ; check right-joystick button-2
             bne     ClearDuck               ; button pushed? go clear animation frames
-SetDuck            
+SetDuck
             lda     #01                     ; set duck state flag
             sta     DuckState               ; setup Dino ducking
             bra     ButtDone                ; always go handle done
-ClearDuck           
+ClearDuck
             lda     #04                     ; need to clear ani-frame above duck
             sta     duckframe               ; store duck frame value
             bra     ButtDone                ; always go handle done
@@ -1442,11 +1442,11 @@ ChckPause
             lda     $FF00                   ; load PIA0 state
             anda    #%00000001              ; check right-joystick button-1
             bne     CheckButt2              ; button pushed? no - go check next button
-GotButt1            
+GotButt1
             inc     ButtonFlag              ; set button flag
             clr     DuckState               ; clear duck state
             bra     ClearDuck               ; always go clear duck state
-CheckButt2  
+CheckButt2
             lda     #$FF                    ; mask keystrokes
             sta     $FF02                   ; push outputs
             lda     $FF00                   ; load PIA0 state
@@ -1455,9 +1455,9 @@ CheckButt2
             lda     $FF00                   ; load PIA0 state
             anda    #%00000100              ; check right-joystick button-2
             bne     ButtDone                ; button pushed? no - go to done
-GotButt2            
+GotButt2
             inc     ButtonFlag              ; set button flag
-ButtDone    
+ButtDone
             rts
 ;}
 
@@ -1471,8 +1471,8 @@ ButtDone
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ChckKeybd
-ChckKeybd   
-            clr     KeyFlag                 ; clear any keystrokes 
+ChckKeybd
+            clr     KeyFlag                 ; clear any keystrokes
 CheckSpace
             lda     #$7F                    ; first check <space> with joy buttons
             sta     $FF02                   ; push outputs
@@ -1487,7 +1487,7 @@ CheckSpace
             anda    #%00001000              ; check bit
             anda    KeyFlag                 ; check against key flag
             beq     CheckEnter              ; nothing? go check <enter> key
-            
+
             lda     JumpState               ; grab jump state
             bne     CheckEnter              ; current jump? yes - go check <enter> key
             lda     #JUMP_FRAMES            ; grab jump frame count
@@ -1498,7 +1498,7 @@ CheckSpace
             clr     KeyFlag                 ; clear keyboard flag
             inc     KeyFlag                 ; set keyboard flag to 1
             bra     DoneKeybd               ; always done with keyboard check
-ClearDuck2            
+ClearDuck2
             lda     #04                     ; need to clear ani-frame above duck
             sta     duckframe               ; store it
             rts
@@ -1513,11 +1513,11 @@ CheckEnter
             lda     $FF00                   ; grab inputs
             anda    #%01000000              ; check <enter> key row-6
             bne     ClearDuck2              ; not pressed? go clear duck state
-            
+
             lda     #01                     ; set duck flag
             sta     DuckState               ; setup Dino ducking
             inc     KeyFlag                 ; set keyboard flag
-DoneKeybd   
+DoneKeybd
             rts
 ;}
 
@@ -1535,45 +1535,45 @@ otherPause
             lda     $FF23                   ; turn off audio
             anda    #%11110111
             sta     $FF23
-            
+
             inc     PauseState              ; set pause state flag
-            
+
             com     CipherTXT               ; set cipher mode
-            
+
             ldx     #othertxt1              ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$0F02        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
-            
+
             ldx     #othertxt2              ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$1083        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
-            
+
             com     CipherTXT               ; reset cipher mode
-            
+
             jsr     WaitForInput            ; go check for input
             clr     PauseState              ; clear pause state
-            
+
             ldx     #blank                  ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$0F00        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
-            
+
             ldx     #VID_START+$1080        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; Go print text
-            
+
             lda     MusicFlag               ; was music playing?
             bne     DoneOtherP              ; no? go to done
-            
+
             lda     $FF23                   ; re-enable audio
             ora     #%00001000
             sta     $FF23
-DoneOtherP            
+DoneOtherP
             rts
 ;}
 
@@ -1590,7 +1590,7 @@ DoneOtherP
 OtherKeys
             lda     KeyFlag
             sta     TempByte
-            
+
             clr     KeyFlag
             jsr     [POLCAT]                ; grab another keystroke
             beq     DoneOther               ; nothing in buffer - let's bail
@@ -1598,7 +1598,7 @@ OtherKeys
             sta     KeyFlag                 ; set keystroke status
             cmpa    #$20                    ; <space> press?
             beq     CheckMkey
-            
+
             ldb     cipher                  ; hmmmmmm
             rolb
             eorb    cipher
@@ -1612,7 +1612,7 @@ OtherKeys
             com     DinoIsGod
             inc     cheatenable
             bra     ShowCheat
-NextKey     
+NextKey
             cmpx    #DINO_BOT
             bne     CheckKeys
             inc     cheatenable
@@ -1627,12 +1627,12 @@ FlashScreen
             lda     #$F8
             sta     $FF22
             ldx     #$AFF
-FlashLoop   
+FlashLoop
             leax    -1,x
             bne     FlashLoop
             lda     #$F0
             sta     $FF22
-CheckKeys            
+CheckKeys
             lda     KeyFlag
 CheckMkey
             cmpa    #77                     ; 'M' keystroke
@@ -1642,22 +1642,22 @@ CheckMkey
             eora    #%00001000
             sta     $FF23
             rts
-CheckPkey            
+CheckPkey
             cmpa    #80                     ; 'P' keystroke
             beq     doPause
-CheckRArr   
+CheckRArr
             cmpa    #09                     ; 'Right-Arrow' keystroke
             bne     DoneOther
             jsr     GetTune
             rts
-DoneOther            
+DoneOther
             lda     TempByte
             sta     KeyFlag
-            
+
             rts
 ;}
 
-            
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Pause Game                                                         *
@@ -1671,31 +1671,31 @@ doPause
             lda     $FF23
             anda    #%11110111
             sta     $FF23
-            
+
             inc     PauseState
-            
+
             ldx     #gamepaused             ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$0F0A        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
-            
+
             jsr     WaitForInput
             clr     PauseState
-            
+
             ldx     #blank                  ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$0F00        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
-            
+
             lda     MusicFlag
             bne     DonePause
-            
+
             lda     $FF23
             ora     #%00001000
             sta     $FF23
-DonePause            
+DonePause
             rts
 ;}
 
@@ -1714,7 +1714,7 @@ HandleTime
             leax    1,x
             stx     Timer
             rts
-;}            
+;}
 
 
 ;*******************************************************************************
@@ -1741,10 +1741,10 @@ SetInput
             inc     InputFlag
             clr     ButtonFlag
             clr     DuckState
-DoneInput            
+DoneInput
             rts
 ;}
-            
+
 
 ;*******************************************************************************
 ;*                                                                             *
@@ -1759,13 +1759,13 @@ WaitForInput
             lda     PauseState
             bne     GetInput
             inc     PauseState
-GetInput            
+GetInput
             jsr     HandleTime
             jsr     GetEntropy
             jsr     CheckInput
             lda     InputFlag
             beq     WaitForInput
-DoneWait    
+DoneWait
             lda     #04                     ; need to clear ani-frame above duck
             sta     duckframe
             clr     ButtonFlag
@@ -1774,7 +1774,7 @@ DoneWait
             rts
 ;}
 
-           
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Score Handler - using a decade counter method                      *
@@ -1793,7 +1793,7 @@ ScoreHandle
             ldx     TotDist
             abx
             stx     TotDist
-CountScore            
+CountScore
             inc     ScrUnit                 ; handle units place
             ldb     ScrUnit
             stb     ScoreTemp
@@ -1845,7 +1845,7 @@ CountScore
             clr     ScrTenTh
 ScoreChk                                    ; done with scoreboard update
             bsr     HandleLevel
-            rts                     
+            rts
 ;}
 
 ;*******************************************************************************
@@ -1857,20 +1857,20 @@ ScoreChk                                    ; done with scoreboard update
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ScoreChange
-ScoreChange 
+ScoreChange
             ldu     #SCORE_START            ; get start of scoreboard
             leau    a,u                     ; offset scoreboard position
             ldb     ScoreTemp               ; get temp score value
             cmpb    #$0A                    ; are we at '10'?
             bne     ScoreCont               ; go do the digit
             clrb                            ; reset to zero
-ScoreCont   
+ScoreCont
             lda     #8                      ; 8-bytes per char
             mul                             ; font x8-bytes
             ldx     #numbers                ; get numbers font location
             leax    d,x                     ; store offset location
             lda     #8
-MoreFont    
+MoreFont
             ldb     ,x+                     ; get font byte, index font pointer
             stb     ,u                      ; store on screen
             leau    32,u                    ; cycle index - next scan line
@@ -1890,7 +1890,7 @@ MoreFont
 ;*                                                                             *
 ;*******************************************************************************
 ;{          ResetScore
-ResetScore     
+ResetScore
             clr     ScrUnit
             clr     ScrTen
             clr     ScrHund
@@ -1907,7 +1907,7 @@ loopScore   lda     ,u+
             cmpx    #SCORE_START+$100
             blt     bigScore
             clr     ScoreTemp
-ClearScore  
+ClearScore
             lda     #$05
             adda    scoredigits
             bsr     ScoreChange
@@ -1915,7 +1915,7 @@ ClearScore
             bne     ClearScore
             lda     #$05
             sta     scoredigits
-doneScore            
+doneScore
             rts
 ;}
 
@@ -1955,7 +1955,7 @@ Check1                                      ; check level-1 done
 Handle1
             lda     #30                     ; newobheight
             ldb     #11                     ; newmntspeed
-            std     newobheight             ; update both values    
+            std     newobheight             ; update both values
 Check2                                      ; check level-2 done
             cmpx    #LEVEL_2                ; level-3 yet?
             blo     DoneLevel               ; still less? go to done
@@ -1982,7 +1982,7 @@ Check4                                      ; check level-4 done
             cmpx    #LEVEL_4                ; level-5 yet?
             blo     DoneLevel               ; still less? go to done
             inc     GameLevel               ; increment to next level
-Handle4 
+Handle4
             lda     #24                     ; newobheight
             ldb     #8                      ; newmntspeed
             std     newobheight             ; update both values
@@ -1999,14 +1999,14 @@ Handle5
             sta     obstaclechk             ; update it
             rts
 Check6                                      ; check level-6 done
-            cmpx    #LEVEL_6                ; level-7 yet?    
+            cmpx    #LEVEL_6                ; level-7 yet?
             blo     DoneLevel               ; still less? go to done
             inc     GameLevel               ; increment to next level
 Handle6
             lda     #20                     ; newobheight
             ldb     #6                      ; newmntspeed
             std     newobheight             ; update both values
-            rts             
+            rts
 Check7                                      ; check level-7 done
             cmpx    #LEVEL_7                ; max level yet?
             blo     DoneLevel               ; still less? go to done
@@ -2018,7 +2018,7 @@ Handle7
             lda     #12                     ; new obstacle level
             sta     obstaclechk             ; update it
 DoneLevel
-            rts           
+            rts
 ;}
 
 
@@ -2036,26 +2036,26 @@ HandleHigh
             suba    HScrTenTh
             blo     DoneHScore
             bne     NewHigh
-            
+
             lda     ScrThou
             suba    HScrThou
             blo     DoneHScore
             bne     NewHigh
-            
+
             lda     ScrHund
             suba    HScrHund
             blo     DoneHScore
             bne     NewHigh
-            
+
             lda     ScrTen
             suba    HScrTen
             blo     DoneHScore
             bne     NewHigh
-            
+
             lda     ScrUnit
             suba    HScrUnit
             blo     DoneHScore
-NewHigh     
+NewHigh
             lda     ScrTenTh
             sta     HScrTenTh
             lda     ScrThou
@@ -2087,29 +2087,29 @@ ShowHigh
             ldx     #HIGH_SCORE             ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
-   
+
             lda     #03                     ; handle ten-thousandths digit
             ldb     HScrTenTh               ; get digit value
             jsr     HScoreChange            ; go handle digit update
-            
+
             lda     #04                     ; handle thousandths digit
             ldb     HScrThou                ; get digit value
             jsr     HScoreChange            ; go handle digit update
-            
+
             lda     #05                     ; handle hundreths digit
             ldb     HScrHund                ; get digit value
             jsr     HScoreChange            ; go handle digit update
-            
+
             lda     #06                     ; handle tens digit
             ldb     HScrTen                 ; get digit value
             jsr     HScoreChange            ; go handle digit update
-            
+
             lda     #07                     ; handle units digit
             ldb     HScrUnit                ; get digit value
             jsr     HScoreChange            ; go handle digit update
-doneHigh             
+doneHigh
             rts
-            
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          High Score Change - update high scoreboard                         *
@@ -2119,16 +2119,16 @@ doneHigh
 ;*                                                                             *
 ;*******************************************************************************
 ;{          HScoreChange
-HScoreChange 
+HScoreChange
             ldu     #HIGH_SCORE             ; get start of scoreboard
             leau    a,u                     ; offset scoreboard position
-HScoreCont   
+HScoreCont
             lda     #8                      ; 8-bytes per char
             mul                             ; font x8-bytes
             ldx     #numbers                ; get numbers font location
             leax    d,x                     ; store offset location
             lda     #8                      ; reset 8-bytes per char
-HMoreFont    
+HMoreFont
             ldb     ,x+                     ; get font byte, index font pointer
             stb     ,u                      ; store on screen
             leau    32,u                    ; cycle index - next scan line
@@ -2154,22 +2154,22 @@ HandleTitle
             clr     Timer               ; reset timer for timeout
             inc     DemoMode            ; get ready for demo mode
             jsr     InitVars
-            
-CycleInput  
+
+CycleInput
             jsr     CheckInput
             jsr     HandleTime
             lda     Timer
             cmpa    #$36
             blo     ChckInput
             jsr     HandleInstr
-            
+
             jmp     doDemo
-ChckInput            
+ChckInput
             lda     InputFlag
             beq     CycleInput
-            
+
             clr     DemoMode
-            
+
             jsr     InitVars
             jmp     NewGame
 
@@ -2189,25 +2189,25 @@ ChckInput
 HandleInstr
             jsr     InstructPage
             clr     Timer
-CycleInput2 
+CycleInput2
             jsr     CheckInput
             jsr     HandleTime
             lda     Timer
             cmpa    #$36
             blo     ChckInput2
             bra     DoneInstr
-ChckInput2            
+ChckInput2
             lda     InputFlag
             beq     CycleInput2
             clr     DemoMode
-            
+
             jsr     InitVars
             jmp     NewGame
 DoneInstr
             rts
 ;}
 
- 
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          Title Page                                                         *
@@ -2217,12 +2217,12 @@ DoneInstr
 ;*                                                                             *
 ;*******************************************************************************
 ;{          Title Page
-TitlePage   
+TitlePage
             jsr     ClearGraphics           ; clear screen first
             ldb     #4			            ; GFX fade speed (frames)
             stb     wvs+1                   ; set plot speed (GFX)
             jsr     TitleGraphic            ; do title graphic
-            
+
             ldb     #45			            ; text plot speed (frames)
             stb     wvs+1                   ; set plot speed (text)
             jsr     wvs                     ; go wait vsyncs
@@ -2240,35 +2240,35 @@ TitlePage
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
             jsr     wvs                     ; go wait vsyncs
-            
+
             ldx     pfcredits
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$0E08        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     pfWord                  ; go print text
             jsr     wvs                     ; go wait vsyncs
-            
+
             ldx     #title3                 ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$1106        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
             jsr     wvs                     ; go wait vsyncs
-            
+
             ldx     andcredits
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$124E        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     andWord                 ; go print text
             jsr     wvs                     ; go wait vsyncs
-            
+
             ldx     #title5                 ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$1347        ; location to print on screen
             stx     PrintAtLoc              ; store location to print at
             jsr     PrintAtGr               ; go print text
             jsr     wvs                     ; go wait vsyncs
-            
+
             ldx     #title6                 ; get title text memory index
             stx     StringLoc               ; store in string location var
             ldx     #VID_START+$1509        ; location to print on screen
@@ -2288,7 +2288,7 @@ DoneTitle
 ;*                                                                             *
 ;*******************************************************************************
 ;{          InstructPage
-InstructPage   
+InstructPage
             ldb     #08                 ; Text plot speed (frames)
             stb     wvs+1               ; Store v-sync count
             jsr     wvs                 ; Go print text
@@ -2304,31 +2304,31 @@ InstructPage
             ldx     #VID_START+$0C00    ; location to print on screen
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
-            
+
             ldx     #blank              ; get blank text
             stx     StringLoc           ; store in string location var
             ldx     #VID_START+$0E00    ; location to print on screen
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
-            
+
             ldx     #blank              ; get blank text
             stx     StringLoc           ; store in string location var
             ldx     #VID_START+$1100    ; location to print on screen
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
-            
+
             ldx     #blank              ; get blank text
             stx     StringLoc           ; store in string location var
             ldx     #VID_START+$1240    ; location to print on screen
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
-            
+
             ldx     #blank              ; get blank text
             stx     StringLoc           ; store in string location var
             ldx     #VID_START+$1340    ; location to print on screen
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
-            
+
             ldx     #blank              ; get blank text
             stx     StringLoc           ; store in string location var
             ldx     #VID_START+$1500    ; location to print on screen
@@ -2347,8 +2347,8 @@ InstructPage
             ldx     #VID_START+$0D01    ; location to print on screen
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
-            jsr     wvs            
-            
+            jsr     wvs
+
             ldx     #instruct2          ; get instructions text memory index
             stx     StringLoc           ; store in string location var
             ldx     #VID_START+$0F02    ; location to print on screen
@@ -2383,13 +2383,13 @@ InstructPage
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
             jsr     wvs
-            
+
             ldx     #headerrow          ; get header text memory index
             stx     StringLoc           ; store in string location var
             ldx     #VID_START+$1501    ; location to print on screen
             stx     PrintAtLoc          ; store location to print at
             jsr     PrintAtGr           ; Go print text
-            jsr     wvs            
+            jsr     wvs
 
 DoneInstuct
             rts
@@ -2436,7 +2436,7 @@ xx          fcb     %11111111               ; byte for gfx effect
 ;*                                                                             *
 ;*******************************************************************************
 ;{          wvs
-wvs         
+wvs
             ldb     #4                      ; set v-sync counter
 vs          lda     $ff03                   ; check v-sync status
             bpl     vs                      ; there yet? no - go wait some more
@@ -2455,19 +2455,19 @@ vs          lda     $ff03                   ; check v-sync status
 ;*                                                                             *
 ;*******************************************************************************
 ;{          PrintAtGr
-PrintAtGr   
+PrintAtGr
             ldx     PrintAtLoc              ; grab screen location from memory variable
             ldy     StringLoc               ; grab string location from memory variable
-PrintLoop            
+PrintLoop
             lda     ,y+                     ; grab first byte of string
             beq     DonePrint               ; done with string, go to DonePrint
 ;            inc     lettercount            ; is this still needed?
-DoChar                  
+DoChar
             anda    #%00111111              ; subtract 64 from ASCII value
             ldb     CipherTXT               ; check for cipher
             beq     DoText                  ; cipher? no - go do text
             suba    #$0D                    ; modify text
-DoText              
+DoText
             ldb     #08                     ; 8-bytes per character
             mul                             ; get our character index offset
             ldu     #letters                ; memory index of font
@@ -2594,54 +2594,54 @@ DoObstBand                                  ; routine to ROL full scan line
             rol     -29,x
             rol     -30,x
             rol     -31,x
-            
+
             lda     SCRL_OFFSET,x           ; merge obstacle temp space with Dino bounding box
             coma
             sta     OBST_TEMPOF+8,x
             ora     -24+DINO_TEMPOF,x
             coma
             sta     -24,x
-            
+
             lda     SCRL_OFFSET-1,x
             coma
             sta     OBST_TEMPOF+7,x
             ora     -25+DINO_TEMPOF,x
             coma
             sta     -25,x
-            
+
             lda     SCRL_OFFSET-2,x
             coma
             sta     OBST_TEMPOF+6,x
             ora     -26+DINO_TEMPOF,x
             coma
-            sta     -26,x            
+            sta     -26,x
 
             dec     obstclrows              ; decrement row counter
             beq     BandDone                ; are we done? yes - go to done
             leax    -32,x                   ; shift index by full scan line
             jmp     DoObstBand              ; go do obstacle band loop
 
-BandDone                
+BandDone
             jsr     CheckObst               ; go check moving obstacles
             lda     newobheight             ; grab obstacle height
             sta     obstclrows              ; store as rows for ROL'ing
             jmp     ObstLoop                ; go do more looping
-ObstDone    
+ObstDone
             lda     #OBST_SPEED             ; grab obstacle speed counter
             sta     obstaclespd             ; store it
-            rts	
-            
+            rts
+
             ldx     #PTERO_ROW              ; grab where Pterodactyls start
             leax    1023,x                  ; offset it (32 scan lines minus 1-byte column)
-CopyObst    
+CopyObst
             dec     obstclrows              ; decrement obstacle rows
             beq     CopyDone                ; done? yes - finish obstacle band
             leax    -32,x                   ; decrement by a single scan line
             bra     CopyObst                ; always loop obstacle copy
-CopyDone    
+CopyDone
             lda     #OBST_HEIGHT            ; grab obstacle height var
             sta     obstclrows              ; store it
-ScrollDone  
+ScrollDone
             rts
 ;}
 
@@ -2659,7 +2659,7 @@ CheckObst
             ldx     TotDist
             cmpx    #100
             blo     ObCheck
-            
+
             lda     DemoMode
             bne     ObCheck
             lda     DinoBot
@@ -2668,19 +2668,19 @@ ObCheck
             lda     curobst1
             beq     Chck2
             dec     curobst1
-Chck2       
+Chck2
             lda     curobst2
             beq     Chck3
             dec     curobst2
-Chck3       
+Chck3
             lda     curobst3
             beq     Chck4
-            dec     curobst3            
-Chck4       
+            dec     curobst3
+Chck4
             lda     curobst4
             beq     CheckPtero
             dec     curobst4
-CheckPtero            
+CheckPtero
             lda     PteroFlag
             beq     DoneObChck
             dec     PteroHPos
@@ -2694,25 +2694,25 @@ FlapPtero
             anda    #%00001111              ; Even 2-byte boundary?
             bne     DoneObChck
             ldb     PteroHPos
-            rorb                    
+            rorb
             rorb
             rorb
             ldx     #PTERO_ROW-32
             abx
-            
+
             lda     PteroVPos
             ldb     #32
             mul
             leax    d,x
-            
+
             com     PteroFlap
             bne     Flap2
-Flap1 
+Flap1
             ldy     #pterodactyl1
             bra     loopPtero2
-Flap2       
+Flap2
             ldy     #pterodactyl2
-loopPtero2  
+loopPtero2
             lda     ,y+
             beq     DoneObChck
             sta     ,x+
@@ -2722,7 +2722,7 @@ loopPtero2
             sta     ,x
             leax    30,x
             bra     loopPtero2
-DoneObChck  
+DoneObChck
             rts
 
 
@@ -2740,8 +2740,8 @@ GetEntropy
             sta     $0113                   ; store it
             jsr     InitRandom              ; go handle randomness
             rts
-;}            
-            
+;}
+
 ;*******************************************************************************
 ;*                                                                             *
 ;*          InitRandom                                                         *
@@ -2761,7 +2761,7 @@ store_rng   sta     rndx+1                  ; store it in our pointer
 ;*******************************************************************************
 ;*                                                                             *
 ;*          GetRandom                                                          *
-;*           Pseudo-Random Number Generator                                    * 
+;*           Pseudo-Random Number Generator                                    *
 ;*           ------------------------------------------------                  *
 ;*           Input  : none                                                     *
 ;*           Output : a (8bit RND)                                             *
@@ -2784,7 +2784,7 @@ rndb        adda    #00                     ; add new value to contents of secon
             sta     rndc+1                  ; store value into third temp pointer
             sta     rndx+1                  ; store new value back to our pointer
             rts
-;}  
+;}
 
 
 ;*******************************************************************************
@@ -2792,7 +2792,7 @@ rndb        adda    #00                     ; add new value to contents of secon
 ;*          Variables which do not need to reside in DP                        *
 ;*                                                                             *
 ;*******************************************************************************
-;{          
+;{
 CipherTXT   zmb     1                       ; Cipher char
 HScrUnit    zmb     1                       ; High Scoreboard - units value
 HScrTen     zmb     1                       ; High Scoreboard - tens value
@@ -2802,7 +2802,7 @@ HScrTenTh   zmb     1                       ; High Scoreboard - ten-thousandths 
 PrintAtLoc  zmb     2                       ; Print  Location
 StringLoc   zmb     2                       ; String location in memory (Print-At)
 
-nointernet  fcn     'NO INTERNET'            
+nointernet  fcn     'NO INTERNET'
 gameover    fcn     'GAME OVER'
 gamepaused  fcn     'GAME PAUSED'
 blank       fcn     '                                '
@@ -2825,15 +2825,15 @@ othertxt1   fcn     '**************************'
 othertxt2   fcn     '************************'
 
 
-            include	    ".\include\dinorun\dinofont.asm"
-            include	    ".\include\dinorun\dinosprites.asm"
-            
+            include	    "dinofont.asm"
+            include	    "dinosprites.asm"
+
             align   $100
-            
-pic         includebin  ".\include\dinorun\dinomnt.raw"
+
+pic         includebin  "dinomnt.raw"
 endpic      equ     *
 
-dinopic     includebin  ".\include\dinorun\dinorun.raw"
+dinopic     includebin  "dinorun.raw"
 enddinopic  equ     *
 
 ;*******************************************************************************
@@ -2857,12 +2857,12 @@ freqtab     align   $100
 
 
 dinotune1
-            include	    ".\include\dinorun\dinotun1.asm"
-dinotune2            
-            include	    ".\include\dinorun\dinotun2.asm"
-dinotune3            
-            include	    ".\include\dinorun\dinotun3.asm"            
-            
+            include	    "dinotun1.asm"
+dinotune2
+            include	    "dinotun2.asm"
+dinotune3
+            include	    "dinotun3.asm"
+
 version     fcn     'v1.2.1 10-17-21'
-            
+
             end     Start
