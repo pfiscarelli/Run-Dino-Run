@@ -5,7 +5,7 @@ cls
 set LWTOOLS_PATH="%USERPROFILE%\Desktop\lwtools"
 set TOOLSHED_PATH="%USERPROFILE%\Desktop\toolshed"
 set MAME_PATH="%USERPROFILE%\Desktop\MESS"
-set VCC_PATH="%USERPROFILE%\Desktop\VCC\" 
+set VCC_PATH="%USERPROFILE%\Desktop\VCC\"
 set VCC_COMMAND="%USERPROFILE%\Desktop\VCC\VCC.exe"
 set XROAR_PATH="%USERPROFILE%\Desktop\XRoar\"
 set XROAR_COMMAND="%USERPROFILE%\Desktop\XRoar\xroar.exe"
@@ -45,7 +45,7 @@ echo.
 
 :: Assemble the source code to binary
 cd %LWTOOLS_PATH%
-lwasm %source_path% --6809 --list="C:\Users\Paul\Desktop\CoCo Development\RunDinoRun\rundino.out" --symbols --6800compat --output=%binary_path% --format=decb
+lwasm %source_path% --includedir=%INC_PATH% --6809 --list="C:\Users\Paul\Desktop\CoCo Development\RunDinoRun\rundino.out" --symbols --6800compat --output=%binary_path% --format=decb
 if %ERRORLEVEL% neq 0 goto:done
 
 :: Copy binary file to disk image
