@@ -2,13 +2,13 @@
 
 <div id="image-table">
     <table>
-	    <tr>
-    	    <td style="padding:5px" align="center">
-        	    <img src="./images/dino_run_title.png" border="3" width="512" height="320">
+        <tr>
+            <td style="padding:5px" align="center" width=50%>
+                <img src="./images/dino_run_title.png" border="3" width=100% height="320">
       	    </td>
-            <td style="padding:5px" align="center">
-            	<img src="./images/dino_run_play.gif" border="3" width="512" height="320">
-             </td>
+            <td style="padding:5px" align="center" width=50%>
+            	<img src="./images/dino_run_play.gif" border="3" width=100% height="320">
+            </td>
         </tr>
     </table>
 </div>
